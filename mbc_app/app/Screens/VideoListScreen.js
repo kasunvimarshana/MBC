@@ -22,6 +22,7 @@ import {
 } from 'react-native-paper';
 import { FontAwesome } from '@expo/vector-icons';
 import { connect } from 'react-redux';
+import * as ScreenOrientation from 'expo-screen-orientation';
 
 import { getAllVideos } from '../Store/Actions/VideoAction';
 import VideoCardItem from '../Components/VideoCardItem';
@@ -66,6 +67,23 @@ class VideoListScreen extends Component {
 
     listItemClickHandler = (item) => {
         this.props.navigation.navigate('PlayerScreen', {video: item});
+    }
+
+    switchToLandscape = async () => {
+        console.log('switchToLandscape');
+        //ScreenOrientation.allow(ScreenOrientation.Orientation.LANDSCAPE);
+        ScreenOrientation.lockAsync(ScreenOrientation.OrientationLock.LANDSCAPE);
+    }
+
+    switchToPortrait = async () => {
+        console.log('switchToPortrait');
+        //ScreenOrientation.allow(ScreenOrientation.Orientation.PORTRAIT);
+        ScreenOrientation.lockAsync(ScreenOrientation.OrientationLock.PORTRAIT);
+    }
+
+    switchToDefaultOrientation = async () => {
+        console.log('switchToDefaultOrientation');
+        ScreenOrientation.unlockAsync();
     }
 
     render() {

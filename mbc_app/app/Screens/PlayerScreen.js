@@ -72,7 +72,16 @@ class PlayerScreen extends Component {
         const { width, height } = param.window;
         const isLandscape = width > height;
         this.setState({ isPortrait: !isLandscape });
-        //ScreenOrientation.allow(ScreenOrientation.Orientation.ALL);
+        this.switchToDefaultOrientation();
+    }
+
+    onFullscreenUpdateHandler = async () => {
+        await ScreenOrientation.lockAsync( 
+            this.state.isPortrait ? 
+            ScreenOrientation.OrientationLock.LANDSCAPE_LEFT : 
+            ScreenOrientation.OrientationLock.PORTRAIT 
+        );
+        this.setState({ isPortrait: !isLandscape });
     }
 
     /*
@@ -83,26 +92,36 @@ class PlayerScreen extends Component {
 
     componentDidMount() {
         //ScreenOrientation.allow(ScreenOrientation.Orientation.ALL);
-        Dimensions.addEventListener('change', this.onOrientationChangeListner);
+        //Dimensions.addEventListener('change', this.onOrientationChangeListner);
     }
 
     componentWillUnmount() {
         //ScreenOrientation.removeOrientationChangeListener(this.screenOrientationSubscription);
         //ScreenOrientation.allow(ScreenOrientation.Orientation.PORTRAIT);
-        Dimensions.removeEventListener('change', this.onOrientationChangeListner);
+        //Dimensions.removeEventListener('change', this.onOrientationChangeListner);
     }
 
-    switchToLandscape() {
+    switchToLandscape = async () => {
+        console.log('switchToLandscape');
         //ScreenOrientation.allow(ScreenOrientation.Orientation.LANDSCAPE);
+        ScreenOrientation.lockAsync(ScreenOrientation.OrientationLock.LANDSCAPE);
     }
 
-    switchToPortrait() {
+    switchToPortrait = async () => {
+        console.log('switchToPortrait');
         //ScreenOrientation.allow(ScreenOrientation.Orientation.PORTRAIT);
+        ScreenOrientation.lockAsync(ScreenOrientation.OrientationLock.PORTRAIT);
+    }
+
+    switchToDefaultOrientation = async () => {
+        console.log('switchToDefaultOrientation');
+        ScreenOrientation.unlockAsync();
     }
 
     render() {
         const video = this.getSelectedVideo();
         console.log('video', video);
+        
         const icon = (name, size = 36) => () => (
             <Ionicons
                 name={name}
@@ -127,20 +146,24 @@ class PlayerScreen extends Component {
                                     isLooping: false,
                                     //useNativeControls: true,
                                     videoRef: this._handleVideoRef,
-                                    onError: (error) => { this.onErrorHandler(error) },
-                                    onPlaybackStatusUpdate: (status) => { this.onPlaybackStatusUpdateHandler(status) }
+                                    //onError: (error) => { this.onErrorHandler(error) },
+                                    //onPlaybackStatusUpdate: (status) => { this.onPlaybackStatusUpdateHandler(status) },
+                                    //onReadyForDisplay: ( params ) => {
+                                    //    params.naturalSize.orientation = "landscape";
+                                    //    console.log("params---->", params.naturalSize.orientation);
+                                    //}
                                 }}
 
-                                playIcon={icon('ios-play-outline')}
-                                pauseIcon={icon('ios-pause-outline')}
+                                //playIcon={icon('ios-play-outline')}
+                                //pauseIcon={icon('ios-pause-outline')}
                                 //fullscreenEnterIcon={icon('ios-expand-outline', 28)}
                                 //fullscreenExitIcon={icon('ios-contract-outline', 28)}
-                                textStyle={{
-                                    color: Colors.teal500,
-                                    fontSize: 12,
-                                }}
-                                showFullscreenButton={true}
-                                //isPortrait={this.state.isPortrait}
+                                //textStyle={{
+                                //    color: Colors.teal500,
+                                //    fontSize: 12,
+                                //}}
+                                //showFullscreenButton={true}
+                                isPortrait={this.state.isPortrait}
                                 //switchToLandscape={() => {this.switchToLandscape}}
                                 //switchToPortrait={() => {this.switchToPortrait}}
                                 playFromPositionMillis={0}
