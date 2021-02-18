@@ -1,0 +1,1 @@
+export const REMOTE_VIDEO_API_URI = "http://192.168.43.233/projects/mbc/mbc_web/public";
