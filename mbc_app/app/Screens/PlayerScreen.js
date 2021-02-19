@@ -6,6 +6,7 @@ import {
     TouchableOpacity,
     Dimensions,
     ScrollView,
+    Platform,
     StatusBar 
 } from 'react-native';
 import { 
@@ -83,6 +84,24 @@ class PlayerScreen extends Component {
         );
         this.setState({ isPortrait: !isLandscape });
     }
+
+    /*
+    onFullscreenUpdate = async ({fullscreenUpdate}) => {
+        if (Platform.OS === 'android') {
+            switch (fullscreenUpdate) {
+                case Video.FULLSCREEN_UPDATE_PLAYER_DID_PRESENT:
+                    await ScreenOrientation.unlockAsync();
+                    break;
+                case Video.FULLSCREEN_UPDATE_PLAYER_WILL_DISMISS:
+                    await ScreenOrientation.lockAsync(ScreenOrientation.OrientationLock.PORTRAIT);
+                    break;
+            }
+        }
+    }
+
+    showVideoInFullscreen = async () => { await videoPlayerRef.current.presentFullscreenPlayer(); }
+    */
+
 
     /*
     UNSAFE_componentWillMount() {
@@ -206,7 +225,7 @@ const styles = StyleSheet.create({
         paddingTop: StatusBar.currentHeight || 0,
         justifyContent: 'center',
         alignItems: 'stretch',
-        backgroundColor: Colors.teal400
+        backgroundColor: Colors.lightBlueA100
     },
     contentContainer: {
         flex: 1

@@ -86,20 +86,45 @@ class VideoListScreen extends Component {
         ScreenOrientation.unlockAsync();
     }
 
+    getViewContent = () => {
+        var content = null;
+
+        if( this.state.videoList && this.state.videoList.length > 0 ){
+            content = (
+                <FlatList
+                    data={this.state.videoList}
+                    extraData={this.state.videoList}
+                    ItemSeparatorComponent={ListItemSeparator}
+                    renderItem={ ({item}) => (<VideoCardItem item={item} onPressHandler={() => {this.listItemClickHandler(item)}}/>) }
+                    keyExtractor={(item, index) => index.toString()}
+                    refreshControl={
+                        <RefreshControl refreshing={this.state.isFlatListRefreshing} onRefresh={this.flatListRefreshHandler} />
+                    }
+                />
+            );
+        }else{
+            content = (
+                <Card>
+                    <Card.Content>
+                        <Title>There is no Videos at This Moment</Title>
+                    </Card.Content>
+                </Card>
+            );
+        }
+
+        return content;
+    }
+
     render() {
+
+        const content = this.getViewContent();
+
         return(
             <SafeAreaView style={styles.container}>
                 <View style={styles.contentContainer}>
-                    <FlatList
-                        data={this.state.videoList}
-                        extraData={this.state.videoList}
-                        ItemSeparatorComponent={ListItemSeparator}
-                        renderItem={ ({item}) => (<VideoCardItem item={item} onPressHandler={() => {this.listItemClickHandler(item)}}/>) }
-                        keyExtractor={(item, index) => index.toString()}
-                        refreshControl={
-                            <RefreshControl refreshing={this.state.isFlatListRefreshing} onRefresh={this.flatListRefreshHandler} />
-                        }
-                    />
+                    
+                    {content}
+
                 </View>
             </SafeAreaView>
         );
@@ -113,7 +138,7 @@ const styles = StyleSheet.create({
         paddingTop: StatusBar.currentHeight || 0,
         justifyContent: 'center',
         alignItems: 'stretch',
-        backgroundColor: Colors.teal400
+        backgroundColor: Colors.lightBlueA100
     },
     contentContainer: {
         flex: 1,

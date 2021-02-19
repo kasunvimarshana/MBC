@@ -13,13 +13,15 @@ const mix = require('laravel-mix');
 //@include(public_path('css/styles.css'))
 //https://getbootstrap.com/docs/3.3/components/
 
+mix.setPublicPath('public');
+mix.setResourceRoot("../");
+
 mix.js('resources/js/app.js', 'public/js');
 //mix.postCss('resources/css/app.css', 'public/css', []);
-mix.sass('resources/scss/app.scss', 'public/css');
+mix.sass('resources/scss/app.scss', 'public/css').options({
+    processCssUrls: true
+});
 
 mix.js('resources/js/video/destroy_video.js', 'public/js/video');
 
 mix.copyDirectory('resources/img', 'public/img');
-
-mix.setPublicPath('public');
-//mix.setResourceRoot("../");
