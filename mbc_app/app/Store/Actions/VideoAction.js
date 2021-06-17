@@ -14,7 +14,17 @@ export const getAllVideos = () => {
             fetch( REMOTE_VIDEO_API_URI , {
                 method: 'GET'
             })
-            .then((response) => response.json())
+            .then(async (response) => {
+                if( response.status !== 200 ){
+                    throw new Error( response.status );
+                }
+                let responseData = await response.json();
+                return Object.assign(responseData, {});
+            },
+            (error) => {
+                //console.log('error', error);
+                throw new Error( error );
+            })
             .then((json) => {
                 //console.log(json);
                 if( json && Object.keys(json).length > 0 ){
@@ -28,7 +38,7 @@ export const getAllVideos = () => {
                 resolve(videoList);
             })
             .catch((error) => {
-                console.error("catch", error);
+                console.log("catch", error);
                 reject(error);
             });
         });

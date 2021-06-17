@@ -44,7 +44,8 @@ class VideoListScreen extends Component {
     fetchVideoData = async () => {
         //return this.props.ui_GetAllVideos();
         this.setState({isFlatListRefreshing: true})
-        this.props.ui_GetAllVideos().then((videoList) => {
+        this.props.ui_GetAllVideos()
+        .then(( videoList ) => {
             this.setState((prevState) => {
                 return {
                     ...prevState,
@@ -52,6 +53,15 @@ class VideoListScreen extends Component {
                     isFlatListRefreshing: false
                 }
             });
+        }, (error) => {
+            //console.log('error', error);
+            throw new Error( error );
+        })
+        .catch((error) => {
+            console.log("error", error);
+        })
+        .finally(() => {
+            this.setState({ isFlatListRefreshing: false });
         });
     };
 
@@ -89,28 +99,41 @@ class VideoListScreen extends Component {
     getViewContent = () => {
         var content = null;
 
-        if( this.state.videoList && this.state.videoList.length > 0 ){
-            content = (
-                <FlatList
-                    data={this.state.videoList}
-                    extraData={this.state.videoList}
-                    ItemSeparatorComponent={ListItemSeparator}
-                    renderItem={ ({item}) => (<VideoCardItem item={item} onPressHandler={() => {this.listItemClickHandler(item)}}/>) }
-                    keyExtractor={(item, index) => index.toString()}
-                    refreshControl={
-                        <RefreshControl refreshing={this.state.isFlatListRefreshing} onRefresh={this.flatListRefreshHandler} />
-                    }
-                />
-            );
-        }else{
-            content = (
-                <Card>
-                    <Card.Content>
-                        <Title>There is no Videos at This Moment</Title>
-                    </Card.Content>
-                </Card>
-            );
-        }
+        // if( this.state.videoList && this.state.videoList.length > 0 ){
+        //     content = (
+        //         <FlatList
+        //             data={this.state.videoList}
+        //             extraData={this.state.videoList}
+        //             ItemSeparatorComponent={ListItemSeparator}
+        //             renderItem={ ({item}) => (<VideoCardItem item={item} onPressHandler={() => {this.listItemClickHandler(item)}}/>) }
+        //             keyExtractor={(item, index) => index.toString()}
+        //             refreshControl={
+        //                 <RefreshControl refreshing={this.state.isFlatListRefreshing} onRefresh={this.flatListRefreshHandler} />
+        //             }
+        //         />
+        //     );
+        // }else{
+        //     content = (
+        //         <Card>
+        //             <Card.Content>
+        //                 <Title>There is no Videos at This Moment</Title>
+        //             </Card.Content>
+        //         </Card>
+        //     );
+        // }
+
+        content = (
+            <FlatList
+                data={this.state.videoList}
+                extraData={this.state.videoList}
+                ItemSeparatorComponent={ListItemSeparator}
+                renderItem={ ({item}) => (<VideoCardItem item={item} onPressHandler={() => {this.listItemClickHandler(item)}}/>) }
+                keyExtractor={(item, index) => index.toString()}
+                refreshControl={
+                    <RefreshControl refreshing={this.state.isFlatListRefreshing} onRefresh={this.flatListRefreshHandler} />
+                }
+            />
+        );
 
         return content;
     }
