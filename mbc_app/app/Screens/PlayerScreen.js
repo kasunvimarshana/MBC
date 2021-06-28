@@ -138,6 +138,14 @@ class PlayerScreen extends Component {
     }
 
     _renderVideoPlayer = ( video ) => {
+        const icon = (name, size = 36) => () => (
+            <Ionicons
+                name={name}
+                size={size}
+                color={Colors.teal500}
+                style={{ textAlign: 'center' }}
+            />
+        );
         return (
             <VideoPlayer
                 videoProps={{
@@ -183,69 +191,19 @@ class PlayerScreen extends Component {
         const video = this.getSelectedVideo();
         console.log('video', video);
 
-        if( 1 ){
-            //
+        if( (video) && ( String(video.type).localeCompare("youtube") === 0) ){
+            console.log("test youtube ::::::::::");
         }else{
-            //
+            console.log("test ::::::::::");
+            return this._renderVideoPlayer(video);
         }
     }
 
     render() {
-        const video = this.getSelectedVideo();
-        console.log('video', video);
-        
-        const icon = (name, size = 36) => () => (
-            <Ionicons
-                name={name}
-                size={size}
-                color={Colors.teal500}
-                style={{ textAlign: 'center' }}
-            />
-        );
         return(
             <SafeAreaView style={styles.container}>
                     <View style={styles.contentContainer}>
-                        
-
-                            <VideoPlayer
-                                videoProps={{
-                                    shouldPlay: false,
-                                    resizeMode: Video.RESIZE_MODE_CONTAIN,
-                                    source: video.uri,
-                                    rate: 1.0,
-                                    volume: 1.0,
-                                    isMuted: false,
-                                    isLooping: false,
-                                    //useNativeControls: true,
-                                    videoRef: this._handleVideoRef,
-                                    //onError: (error) => { this.onErrorHandler(error) },
-                                    //onPlaybackStatusUpdate: (status) => { this.onPlaybackStatusUpdateHandler(status) },
-                                    //onReadyForDisplay: ( params ) => {
-                                    //    params.naturalSize.orientation = "landscape";
-                                    //    console.log("params---->", params.naturalSize.orientation);
-                                    //}
-                                }}
-
-                                //playIcon={icon('ios-play-outline')}
-                                //pauseIcon={icon('ios-pause-outline')}
-                                //fullscreenEnterIcon={icon('ios-expand-outline', 28)}
-                                //fullscreenExitIcon={icon('ios-contract-outline', 28)}
-                                //textStyle={{
-                                //    color: Colors.teal500,
-                                //    fontSize: 12,
-                                //}}
-                                //showFullscreenButton={true}
-                                isPortrait={this.state.isPortrait}
-                                //switchToLandscape={() => {this.switchToLandscape}}
-                                //switchToPortrait={() => {this.switchToPortrait}}
-                                playFromPositionMillis={0}
-
-                                inFullscreen={true}
-                                debug={false}
-                                errorCallback={(error) => { this.errorCallbackHandler(error) }}
-                            />
-
-                        
+                        {this._renderPlayer()}
                     </View>
             </SafeAreaView>
         );
