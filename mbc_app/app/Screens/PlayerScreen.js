@@ -24,6 +24,7 @@ import { FontAwesome, Ionicons } from '@expo/vector-icons';
 import { connect } from 'react-redux';
 import { Video } from 'expo-av';
 import VideoPlayer from 'expo-video-player';
+import YouTubePlayer from 'react-native-youtube';
 import * as ScreenOrientation from 'expo-screen-orientation';
 
 const logoImage = require('../Assets/logo-removebg.png');
@@ -51,91 +52,16 @@ class PlayerScreen extends Component {
         return video;
     }
 
-    onErrorHandler = ( error ) => {
-        console.log('onErrorHandler', error);
-    }
-
     errorCallbackHandler = ( error ) => {
         //console.error('Error: ', error.message, error.type, error.obj);
         console.error('errorCallbackHandler', error);
     }
 
-    onPlaybackStatusUpdateHandler = ( playbackStatus ) => {
-        console.error('onPlaybackStatusUpdateHandler', playbackStatus);
-    }
+    UNSAFE_componentWillMount() {}
 
-    onOrientationChangeListner = ( param ) => {
-        //console.log('onOrientationChangeListner', param);
-        this.orientationHandler( param );
-    }
+    componentDidMount() {}
 
-    orientationHandler = ( param ) => {
-        const { width, height } = param.window;
-        const isLandscape = width > height;
-        this.setState({ isPortrait: !isLandscape });
-        this.switchToDefaultOrientation();
-    }
-
-    onFullscreenUpdateHandler = async () => {
-        await ScreenOrientation.lockAsync( 
-            this.state.isPortrait ? 
-            ScreenOrientation.OrientationLock.LANDSCAPE_LEFT : 
-            ScreenOrientation.OrientationLock.PORTRAIT 
-        );
-        this.setState({ isPortrait: !isLandscape });
-    }
-
-    /*
-    onFullscreenUpdate = async ({fullscreenUpdate}) => {
-        if (Platform.OS === 'android') {
-            switch (fullscreenUpdate) {
-                case Video.FULLSCREEN_UPDATE_PLAYER_DID_PRESENT:
-                    await ScreenOrientation.unlockAsync();
-                    break;
-                case Video.FULLSCREEN_UPDATE_PLAYER_WILL_DISMISS:
-                    await ScreenOrientation.lockAsync(ScreenOrientation.OrientationLock.PORTRAIT);
-                    break;
-            }
-        }
-    }
-
-    showVideoInFullscreen = async () => { await videoPlayerRef.current.presentFullscreenPlayer(); }
-    */
-
-
-    /*
-    UNSAFE_componentWillMount() {
-        this.screenOrientationSubscription = ScreenOrientation.addOrientationChangeListener(this.onOrientationChangeListner);
-    }
-    */
-
-    componentDidMount() {
-        //ScreenOrientation.allow(ScreenOrientation.Orientation.ALL);
-        //Dimensions.addEventListener('change', this.onOrientationChangeListner);
-    }
-
-    componentWillUnmount() {
-        //ScreenOrientation.removeOrientationChangeListener(this.screenOrientationSubscription);
-        //ScreenOrientation.allow(ScreenOrientation.Orientation.PORTRAIT);
-        //Dimensions.removeEventListener('change', this.onOrientationChangeListner);
-    }
-
-    switchToLandscape = async () => {
-        console.log('switchToLandscape');
-        //ScreenOrientation.allow(ScreenOrientation.Orientation.LANDSCAPE);
-        ScreenOrientation.lockAsync(ScreenOrientation.OrientationLock.LANDSCAPE);
-    }
-
-    switchToPortrait = async () => {
-        console.log('switchToPortrait');
-        //ScreenOrientation.allow(ScreenOrientation.Orientation.PORTRAIT);
-        ScreenOrientation.lockAsync(ScreenOrientation.OrientationLock.PORTRAIT);
-    }
-
-    switchToDefaultOrientation = async () => {
-        console.log('switchToDefaultOrientation');
-        ScreenOrientation.unlockAsync();
-    }
+    componentWillUnmount() {}
 
     _renderVideoPlayer = ( video ) => {
         const icon = (name, size = 36) => () => (
@@ -156,27 +82,9 @@ class PlayerScreen extends Component {
                     volume: 1.0,
                     isMuted: false,
                     isLooping: false,
-                    //useNativeControls: true,
                     videoRef: this._handleVideoRef,
-                    //onError: (error) => { this.onErrorHandler(error) },
-                    //onPlaybackStatusUpdate: (status) => { this.onPlaybackStatusUpdateHandler(status) },
-                    //onReadyForDisplay: ( params ) => {
-                    //    params.naturalSize.orientation = "landscape";
-                    //    console.log("params---->", params.naturalSize.orientation);
-                    //}
                 }}
-                //playIcon={icon('ios-play-outline')}
-                //pauseIcon={icon('ios-pause-outline')}
-                //fullscreenEnterIcon={icon('ios-expand-outline', 28)}
-                //fullscreenExitIcon={icon('ios-contract-outline', 28)}
-                //textStyle={{
-                //    color: Colors.teal500,
-                //    fontSize: 12,
-                //}}
-                //showFullscreenButton={true}
                 isPortrait={this.state.isPortrait}
-                //switchToLandscape={() => {this.switchToLandscape}}
-                //switchToPortrait={() => {this.switchToPortrait}}
                 playFromPositionMillis={0}
                 inFullscreen={true}
                 debug={false}
@@ -185,16 +93,29 @@ class PlayerScreen extends Component {
         );
     }
 
-    _renderYoutubePlayer = ( video ) => {}
+    _renderYoutubePlayer = ( video ) => {
+        return (
+            <YouTubePlayer
+                videoId="KVZ-P-ZI6W4"
+                play={true}
+                fullscreen={true}
+                loop={false}
+                onReady={e => this.setState({ isReady: true })}
+                onChangeState={e => this.setState({ status: e.state })}
+                onChangeQuality={e => this.setState({ quality: e.quality })}
+                onError={e => this.setState({ error: e.error })}
+                style={{ alignSelf: 'stretch', height: 300 }}
+            />
+        );
+    }
 
     _renderPlayer = () => {
         const video = this.getSelectedVideo();
         console.log('video', video);
 
         if( (video) && ( String(video.type).localeCompare("youtube") === 0) ){
-            console.log("test youtube ::::::::::");
+            return this._renderYoutubePlayer(video);
         }else{
-            console.log("test ::::::::::");
             return this._renderVideoPlayer(video);
         }
     }
@@ -209,26 +130,6 @@ class PlayerScreen extends Component {
         );
     }
 }
-
-/*
-<VideoPlayer
-                            videoProps={{
-                                shouldPlay: false,
-                                resizeMode: Video.RESIZE_MODE_CONTAIN,
-                                source: {
-                                    uri: 'http://41.216.229.205:8080/live/livestream/index.m3u8',
-                                },
-                                rate: 1.0,
-                                volume: 1.0,
-                                isMuted: false,
-                                isLooping: false,
-                                useNativeControls: true
-                            }}
-                            inFullscreen={true}
-                            showFullscreenButton={false}
-                            videoRef={(ref) => this.videoPlayerRef = ref}
-                        />
-*/
 
 const styles = StyleSheet.create({
     container: {
