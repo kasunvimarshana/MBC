@@ -1,0 +1,1 @@
+export const REMOTE_VIDEO_API_URI = "http://mbc.globemw.net/videos/all/json";
