@@ -1,0 +1,4 @@
+/* $fa-font-path: "../../../node_modules/font-awesome/fonts" !default; */
+@import '~bootstrap/dist/css/bootstrap.css';
+@import '~@fortawesome/fontawesome-free/css/all.css';
+@import '~glyphicons-only-bootstrap/css/bootstrap.css';
