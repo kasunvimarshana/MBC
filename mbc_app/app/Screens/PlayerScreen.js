@@ -33,6 +33,7 @@ const logoImage = require('../Assets/logo-removebg.png');
 class PlayerScreen extends Component {
 
     state = {};
+    _isMounted = false;
 
     constructor( props ) {
         super( props );
@@ -60,9 +61,14 @@ class PlayerScreen extends Component {
 
     UNSAFE_componentWillMount() {}
 
-    componentDidMount() {}
+    componentDidMount() {
+        this._isMounted = true;
+        this._activate();
+    }
 
-    componentWillUnmount() {}
+    componentWillUnmount() {
+        this._deactivate();
+    }
 
     _renderVideoPlayer = ( video ) => {
         const icon = (name, size = 36) => () => (

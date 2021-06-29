@@ -7,7 +7,8 @@ import {
     FlatList,
     RefreshControl,
     Dimensions,
-    StatusBar 
+    StatusBar,
+    BackHandler 
 } from 'react-native';
 import { 
     Colors,
@@ -66,7 +67,24 @@ class VideoListScreen extends Component {
     };
 
     componentDidMount() {
+        this.backHandler = BackHandler.addEventListener('hardwareBackPress', this.backOnPressHandler);
         this.fetchVideoData();
+    }
+
+    componentWillUnmount() {
+        // Clean up listener
+        this._isMounted = false;
+        // fix Warning: Can't perform a React state update on an unmounted component
+        this.setState = (state, callback) => {
+            return;
+        };
+        //BackHandler.removeEventListener('hardwareBackPress', this.backOnPressHandler);
+        this.backHandler.remove();
+    }
+
+    backOnPressHandler = () => {
+        //this.goBack();
+        return true;
     }
 
     componentDidUpdate( prevProps ){ }
