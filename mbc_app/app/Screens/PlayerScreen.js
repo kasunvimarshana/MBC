@@ -7,7 +7,7 @@ import {
     Dimensions,
     ScrollView,
     Platform,
-    StatusBar 
+    StatusBar
 } from 'react-native';
 import { 
     Colors,
@@ -24,8 +24,9 @@ import { FontAwesome, Ionicons } from '@expo/vector-icons';
 import { connect } from 'react-redux';
 import { Video } from 'expo-av';
 import VideoPlayer from 'expo-video-player';
-import YouTubePlayer from 'react-native-youtube-iframe';
 import * as ScreenOrientation from 'expo-screen-orientation';
+import { activateKeepAwake, deactivateKeepAwake } from 'expo-keep-awake';
+import YoutubePlayer from '../Components/YoutubePlayer';
 
 const logoImage = require('../Assets/logo-removebg.png');
 
@@ -95,28 +96,29 @@ class PlayerScreen extends Component {
 
     _renderYoutubePlayer = ( video ) => {
         return (
-            <YouTubePlayer
-                videoId="KVZ-P-ZI6W4"
-                play={true}
-                fullscreen={true}
-                loop={false}
-                onReady={e => this.setState({ isReady: true })}
-                onChangeState={e => this.setState({ status: e.state })}
-                height={300}
+            <YoutubePlayer
+                videoId={video.video_uri}
             />
         );
     }
 
     _renderPlayer = () => {
         const video = this.getSelectedVideo();
-        console.log('video', video);
-
+        //console.log('video', video);
         if( (video) && ( String(video.type).localeCompare("youtube") === 0) ){
             return this._renderYoutubePlayer(video);
         }else{
             return this._renderVideoPlayer(video);
         }
     }
+
+    _activate = () => {
+        activateKeepAwake(); 
+    };
+
+    _deactivate = () => {
+        deactivateKeepAwake(); 
+    };
 
     render() {
         return(
