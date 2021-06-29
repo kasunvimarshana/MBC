@@ -24,7 +24,7 @@ import { FontAwesome, Ionicons } from '@expo/vector-icons';
 import { connect } from 'react-redux';
 import { Video } from 'expo-av';
 import VideoPlayer from 'expo-video-player';
-import YouTubePlayer from 'react-native-youtube';
+import YouTubePlayer from 'react-native-youtube-iframe';
 import * as ScreenOrientation from 'expo-screen-orientation';
 
 const logoImage = require('../Assets/logo-removebg.png');
@@ -102,9 +102,7 @@ class PlayerScreen extends Component {
                 loop={false}
                 onReady={e => this.setState({ isReady: true })}
                 onChangeState={e => this.setState({ status: e.state })}
-                onChangeQuality={e => this.setState({ quality: e.quality })}
-                onError={e => this.setState({ error: e.error })}
-                style={{ alignSelf: 'stretch', height: 300 }}
+                height={300}
             />
         );
     }

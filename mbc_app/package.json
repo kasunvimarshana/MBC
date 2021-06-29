@@ -39,7 +39,10 @@
   },
   "devDependencies": {
     "@babel/core": "~7.9.0",
-    "babel-plugin-optional-require": "^0.3.1"
+    "babel-plugin-optional-require": "^0.3.1",
+    "npm-install-peers": "^1.2.2"
   },
+  "peerDependencies": {},
+  "optionalDependencies": {},
   "private": true
 }
