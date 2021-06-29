@@ -48,8 +48,16 @@ const YoutubePlayer = ( props ) => {
             originWhitelist={['*']}
             javaScriptEnabled={true}
             domStorageEnabled={true}
-            source={{uri:`https://www.youtube.com/embed/${videoId}`}}
+            source={{uri:`https://www.youtube.com/embed/${videoId}?
+            rel=0
+            &autoplay=1
+            &controls=1
+            &enablejsapi=1
+            &modestbranding=1
+            &controls=1
+            `}}
             // source={{html: `<iframe 
+            //         id="iframe-id"
             //         width = "100%" 
             //         height = "50%" 
             //         src = "https://www.youtube.com/embed/${videoId}" 
