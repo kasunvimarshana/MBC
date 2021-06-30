@@ -137,17 +137,24 @@ class PlayerScreen extends Component {
     }
 }
 
+const colors = Colors;
+
 const styles = StyleSheet.create({
     container: {
         flex: 1,
-        paddingTop: StatusBar.currentHeight || 0,
         justifyContent: 'center',
         alignItems: 'stretch',
-        backgroundColor: Colors.lightBlueA100
+        backgroundColor: colors.lightBlueA100
     },
+
     contentContainer: {
-        flex: 1
+        flex: 1,
+        // paddingTop: StatusBar.currentHeight || 0,
+        // paddingTop: Constants.statusBarHeight || StatusBar.currentHeight || 0,
+        // flexDirection: "column",
+        // justifyContent: 'center',
     },
+
     player: {
         flex: 1
     }

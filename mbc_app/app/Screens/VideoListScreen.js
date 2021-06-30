@@ -94,7 +94,17 @@ class VideoListScreen extends Component {
     }
 
     listItemClickHandler = (item) => {
-        this.props.navigation.navigate('PlayerScreen', {video: item});
+        this.props.navigation.navigate('DrawerNavigatorRoutes', {
+            screen: 'PlayerRoutes',
+            // initial: true,
+            params: {
+                screen: 'PlayerScreen',
+                // initial: true,
+                params: {
+                    video: item
+                }
+            }
+        });
     }
 
     switchToLandscape = async () => {
@@ -173,17 +183,22 @@ class VideoListScreen extends Component {
 
 }
 
+const colors = Colors;
+
 const styles = StyleSheet.create({
     container: {
         flex: 1,
-        paddingTop: StatusBar.currentHeight || 0,
         justifyContent: 'center',
         alignItems: 'stretch',
-        backgroundColor: Colors.lightBlueA100
+        backgroundColor: colors.lightBlueA100
     },
+
     contentContainer: {
         flex: 1,
+        // paddingTop: StatusBar.currentHeight || 0,
+        // paddingTop: Constants.statusBarHeight || StatusBar.currentHeight || 0,
         flexDirection: "column",
+        justifyContent: 'center',
     }
 });
 
