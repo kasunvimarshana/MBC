@@ -36,6 +36,34 @@ const DrawerContentComponent = ( props ) => {
         }
     };
 
+    const goToRadioScreen_1 = () => {
+        return filteredProps.navigation.replace('DrawerNavigatorRoutes', {
+            screen: 'PlayerRoutes',
+            initial: true,
+            params: {
+                screen: 'AudioPlayerScreeen',
+                initial: true,
+                params: {
+                    audio: {audio_uri: ''}
+                }
+            }
+        });
+    }
+
+    const goToRadioScreen_2 = () => {
+        return filteredProps.navigation.replace('DrawerNavigatorRoutes', {
+            screen: 'PlayerRoutes',
+            initial: true,
+            params: {
+                screen: 'AudioPlayerScreeen',
+                initial: true,
+                params: {
+                    audio: {audio_uri: ''}
+                }
+            }
+        });
+    }
+
     return (
         <View style={styles.sideMenuContainer}>
             {
@@ -57,6 +85,28 @@ const DrawerContentComponent = ( props ) => {
             <DrawerContentScrollView {...filteredProps}>
                 {
                     (<DrawerItemList {...filteredProps} />)
+                }
+
+                {
+                    <DrawerItem
+                        label={({color}) => <Text style={styles.drawerItemLabelText}> Radio 1 </Text>}
+                        onPress={() => { goToRadioScreen_1() }}
+                        // focused={
+                        //     filteredProps.state.routes.findIndex((e) => e.name === filteredProps.route.name) === filteredProps.state.index
+                        // }
+                        // activeTintColor={colors.notification}
+                    />
+                }
+
+                {
+                    <DrawerItem
+                        label={({color}) => <Text style={styles.drawerItemLabelText}> Radio 2 </Text>}
+                        onPress={() => { goToRadioScreen_2() }}
+                        // focused={
+                        //     filteredProps.state.routes.findIndex((e) => e.name === filteredProps.route.name) === filteredProps.state.index
+                        // }
+                        // activeTintColor={colors.notification}
+                    />
                 }
             </DrawerContentScrollView>
         </View>

@@ -16,7 +16,8 @@ import {
 
 import DrawerContentComponent from '../Components/DrawerContentComponent';
 import VideoListScreen from '../Screens/VideoListScreen';
-import PlayerScreen from '../Screens/PlayerScreen';
+import VideoPlayerScreen from '../Screens/VideoPlayerScreen';
+import AudioPlayerScreeen from '../Screens/AudioPlayerScreeen';
 
 const Stack = createStackNavigator();
 const Drawer = createDrawerNavigator();
@@ -66,14 +67,21 @@ const videoListRoutes = (props) => {
 // Player
 const playerRoutes = (props) => {
     const { navigation } = props;
-    const _playerScreen = ( _props = {} ) => {
+    // videoPlayerScreen
+    const _videoPlayerScreen = ( _props = {} ) => {
         //_props = Object.assign({}, _props);
-        return (<PlayerScreen {..._props}/>);
+        return (<VideoPlayerScreen {..._props}/>);
     };
+
+    // audioPlayerScreen
+    const _audioPlayerScreen = ( _props = {} ) => {
+        //_props = Object.assign({}, _props);
+        return (<AudioPlayerScreeen {..._props}/>);
+    }
 
     return (
         <Stack.Navigator 
-            initialRouteName="PlayerScreen"
+            initialRouteName="VideoPlayerScreen"
             // headerMode="screen"
             screenOptions={(screenOptionProps) => {
                 const { route, navigation } = screenOptionProps;
@@ -87,8 +95,24 @@ const playerRoutes = (props) => {
             // mode= "card"
         >
             <Stack.Screen
-                name="PlayerScreen"
-                component={_playerScreen}
+                name="VideoPlayerScreen"
+                component={_videoPlayerScreen}
+                options={(optionProps) => {
+                    const { navigation } = optionProps;
+                    return ({
+                        headerShown: false,
+                        title: null
+                    })
+                }}
+                // listeners={(listenerProps) => {
+                //     const { navigation, route } = listenerProps;
+                //     return ({});
+                // }}
+            />
+
+            <Stack.Screen
+                name="AudioPlayerScreeen"
+                component={_audioPlayerScreen}
                 options={(optionProps) => {
                     const { navigation } = optionProps;
                     return ({

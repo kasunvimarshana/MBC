@@ -103,7 +103,7 @@ class VideoListScreen extends Component {
             screen: 'PlayerRoutes',
             // initial: true,
             params: {
-                screen: 'PlayerScreen',
+                screen: 'VideoPlayerScreen',
                 // initial: true,
                 params: {
                     video: item

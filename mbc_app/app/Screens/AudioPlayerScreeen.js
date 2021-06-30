@@ -22,15 +22,13 @@ import {
 } from 'react-native-paper';
 import { FontAwesome, Ionicons } from '@expo/vector-icons';
 import { connect } from 'react-redux';
-import { Video } from 'expo-av';
-import VideoPlayer from 'expo-video-player';
+import { Audio } from 'expo-av';
 import * as ScreenOrientation from 'expo-screen-orientation';
 import { activateKeepAwake, deactivateKeepAwake } from 'expo-keep-awake';
-import YoutubePlayer from '../Components/YoutubePlayer';
 
 const logoImage = require('../Assets/logo-removebg.png');
 
-class PlayerScreen extends Component {
+class AudioPlayerScreeen extends Component {
 
     state = {};
     _isMounted = false;
@@ -41,17 +39,17 @@ class PlayerScreen extends Component {
             isPortrait: true
         };
 
-        this.videoPlayerRef = React.createRef();
+        this.audioPlayerRef = React.createRef();
     }
 
-    _handleVideoPlayerRef = (component) => {
-        this.videoPlayerRef = component;
+    _handleAudioPlayerRef = (component) => {
+        this.audioPlayerRef = component;
     }
 
-    getSelectedVideo = () => {
-        const { video } = this.props.route.params;
-        video.uri = {uri: video.video_uri};
-        return video;
+    getSelectedAudio = () => {
+        const { audio } = this.props.route.params;
+        audio.uri = {uri: audio.audio_uri};
+        return audio;
     }
 
     errorCallbackHandler = ( error ) => {
@@ -70,52 +68,18 @@ class PlayerScreen extends Component {
         this._deactivate();
     }
 
-    _renderVideoPlayer = ( video ) => {
-        const icon = (name, size = 36) => () => (
-            <Ionicons
-                name={name}
-                size={size}
-                color={Colors.teal500}
-                style={{ textAlign: 'center' }}
-            />
-        );
+    _renderAudioPlayer = ( video ) => {
         return (
-            <VideoPlayer
-                videoProps={{
-                    shouldPlay: false,
-                    resizeMode: Video.RESIZE_MODE_CONTAIN,
-                    source: video.uri,
-                    rate: 1.0,
-                    volume: 1.0,
-                    isMuted: false,
-                    isLooping: false,
-                    videoRef: this._handleVideoRef,
-                }}
-                isPortrait={this.state.isPortrait}
-                playFromPositionMillis={0}
-                inFullscreen={true}
-                debug={false}
-                errorCallback={(error) => { this.errorCallbackHandler(error) }}
-            />
-        );
-    }
-
-    _renderYoutubePlayer = ( video ) => {
-        return (
-            <YoutubePlayer
-                videoId={video.video_uri}
-            />
+          <>
+            <Text> Audio Player</Text>
+          </>
         );
     }
 
     _renderPlayer = () => {
-        const video = this.getSelectedVideo();
-        //console.log('video', video);
-        if( (video) && ( String(video.type).localeCompare("youtube") === 0) ){
-            return this._renderYoutubePlayer(video);
-        }else{
-            return this._renderVideoPlayer(video);
-        }
+        const audio = this.getSelectedAudio();
+        //console.log('audio', audio);
+        return this._renderAudioPlayer(audio);
     }
 
     _activate = () => {
@@ -168,4 +132,4 @@ const mapDispatchToProps = (dispatch) => {
     return {};
 };
 
-export default connect(mapStateToProps, mapDispatchToProps)(PlayerScreen);
+export default connect(mapStateToProps, mapDispatchToProps)(AudioPlayerScreeen);
