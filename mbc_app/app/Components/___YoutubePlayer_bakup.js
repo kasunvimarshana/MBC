@@ -15,7 +15,7 @@ const YoutubePlayer = ( props ) => {
 
     const { videoId } = props;
 
-    const _renderLoadingHandler = () => {
+    const _renderLoadingScreen = () => {
         return <ActivityIndicator 
                 animating={true} 
                 color={Colors.red800} 
@@ -77,7 +77,7 @@ const YoutubePlayer = ( props ) => {
                 flex: 1 
             }}
             startInLoadingState={true}
-            renderLoading={_renderLoadingHandler}
+            renderLoading={_renderLoadingScreen}
             injectedJavaScript={INJECTED_JAVASCRIPT}
         />
     );

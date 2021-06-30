@@ -7,11 +7,10 @@ import {
 } from 'react-native';
 import { 
     Colors,
-    Text,
-    ActivityIndicator 
+    Text 
 } from 'react-native-paper';
 import ReactNativeYoutubeIframe from "react-native-youtube-iframe";
-
+import LoadingComponent from '../Components/LoadingComponent';
 
 const YoutubePlayer = ( props ) => {
 
@@ -93,25 +92,14 @@ const YoutubePlayer = ( props ) => {
     //     head.appendChild(style);
     // })();`;
 
-    const _renderLoadingHandler = () => {
-        return <ActivityIndicator 
-                animating={!isOnReady} 
+    _renderLoadingScreen = ( isAnimating = true ) => {
+        return (
+            <LoadingComponent 
+                animating={isAnimating} 
                 color={Colors.red800} 
                 size='large'
-                style={{
-                    flex: 1,
-                    position: 'absolute',
-                    marginLeft: 'auto',
-                    marginRight: 'auto',
-                    marginTop: 'auto',
-                    marginBottom: 'auto',
-                    left: 0,
-                    right: 0,
-                    top: 0,
-                    bottom: 0,
-                    justifyContent: 'center'
-                }}
             />
+        );
     }
 
     const _onReadyHandler = () => {
@@ -132,7 +120,7 @@ const YoutubePlayer = ( props ) => {
                 // pointerEvents="none"
             >
                 {
-                    ( isOnReady === false ) && _renderLoadingHandler()
+                    ( isOnReady === false ) && _renderLoadingScreen( !isOnReady )
                 }
                 {
                     <ReactNativeYoutubeIframe

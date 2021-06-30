@@ -28,6 +28,7 @@ import * as ScreenOrientation from 'expo-screen-orientation';
 import { getAllVideos } from '../Store/Actions/VideoAction';
 import VideoCardItem from '../Components/VideoCardItem';
 import ListItemSeparator from '../Components/ListItemSeparator';
+import LoadingComponent from '../Components/LoadingComponent';
 const logoImage = require('../Assets/logo-removebg.png');
 
 class VideoListScreen extends Component {
@@ -38,7 +39,8 @@ class VideoListScreen extends Component {
         super( props );
         this.state = {
             videoList: [],
-            isFlatListRefreshing: false
+            isFlatListRefreshing: false,
+            isOnReady: false
         };
     }
 
@@ -68,7 +70,10 @@ class VideoListScreen extends Component {
 
     componentDidMount() {
         this.backHandler = BackHandler.addEventListener('hardwareBackPress', this.backOnPressHandler);
-        this.fetchVideoData();
+        this.fetchVideoData()
+        .finally(() => {
+            this.setState({ isOnReady: true });
+        });
     }
 
     componentWillUnmount() {
@@ -158,12 +163,26 @@ class VideoListScreen extends Component {
                 renderItem={ ({item}) => (<VideoCardItem item={item} onPressHandler={() => {this.listItemClickHandler(item)}}/>) }
                 keyExtractor={(item, index) => index.toString()}
                 refreshControl={
-                    <RefreshControl refreshing={this.state.isFlatListRefreshing} onRefresh={this.flatListRefreshHandler} />
+                    <RefreshControl 
+                        refreshing={this.state.isFlatListRefreshing} 
+                        onRefresh={this.flatListRefreshHandler} 
+                        // enabled={this.state.isOnReady}
+                    />
                 }
             />
         );
 
         return content;
+    }
+
+    _renderLoadingScreen = ( isAnimating = true ) => {
+        return (
+            <LoadingComponent 
+                animating={isAnimating} 
+                color={Colors.red800} 
+                size='large'
+            />
+        );
     }
 
     render() {
@@ -173,7 +192,11 @@ class VideoListScreen extends Component {
         return(
             <SafeAreaView style={styles.container}>
                 <View style={styles.contentContainer}>
-                    
+
+                    {
+                        ( this.state.isOnReady === false ) && this._renderLoadingScreen( !this.state.isOnReady )
+                    }
+
                     {content}
 
                 </View>
