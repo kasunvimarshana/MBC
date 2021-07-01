@@ -120,7 +120,7 @@ const YoutubePlayer = ( props ) => {
                 // pointerEvents="none"
             >
                 {
-                    ( isOnReady === false ) && _renderLoadingScreen( !isOnReady )
+                    ( isOnReady !== true ) && _renderLoadingScreen( !isOnReady )
                 }
                 {
                     <ReactNativeYoutubeIframe
