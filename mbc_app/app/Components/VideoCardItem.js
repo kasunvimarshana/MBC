@@ -22,25 +22,19 @@ import { FontAwesome } from '@expo/vector-icons';
 
 const logoImage = require('../Assets/logo-removebg.png');
 
-const VideoCardItem = ({item, onPressHandler}) => {
+const VideoCardItem = ({item, onPressHandler, viewStyle, contentStyle}) => {
 
     const featuredImage = (item.image_uri) ? {'uri' : item.image_uri} : logoImage;
 
     const cardOnPressHandler = () => {
-        onPressHandler();
+        // onPressHandler();
     };
 
     return (
-        <View>
-            <TouchableOpacity onPress={ cardOnPressHandler }>
-                <Card>
-                    <Card.Content>
-                        <Title>{item.name}</Title>
-                    </Card.Content>
-                    <Card.Cover source={featuredImage} />
-                    <Card.Content>
-                        <Paragraph>{item.description}</Paragraph>
-                    </Card.Content>
+        <View style={[viewStyle]}>
+            <TouchableOpacity onPress={ cardOnPressHandler } style={[contentStyle, {padding: 3}]}>
+                <Card style={[{flex: 1}]}>
+                    <Card.Cover source={featuredImage} style={{flex: 1, width: '100%', height: '100%', resizeMode: 'contain'}} />
                 </Card>
             </TouchableOpacity>
         </View>
@@ -59,6 +53,25 @@ const VideoCardItem = ({item, onPressHandler}) => {
                     <Button>Ok</Button>
                 </Card.Actions>
             </Card>
+*/
+
+
+/*
+
+<View>
+            <TouchableOpacity onPress={ cardOnPressHandler }>
+                <Card>
+                    <Card.Content>
+                        <Title>{item.name}</Title>
+                    </Card.Content>
+                    <Card.Cover source={featuredImage} />
+                    <Card.Content>
+                        <Paragraph>{item.description}</Paragraph>
+                    </Card.Content>
+                </Card>
+            </TouchableOpacity>
+        </View>
+
 */
 
 export default VideoCardItem;

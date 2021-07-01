@@ -8,8 +8,7 @@ import {
     RefreshControl,
     Dimensions,
     StatusBar,
-    BackHandler ,
-    Platform
+    BackHandler 
 } from 'react-native';
 import { 
     Colors,
@@ -113,22 +112,55 @@ class VideoListScreen extends Component {
         });
     }
 
+    switchToLandscape = async () => {
+        console.log('switchToLandscape');
+        //ScreenOrientation.allow(ScreenOrientation.Orientation.LANDSCAPE);
+        ScreenOrientation.lockAsync(ScreenOrientation.OrientationLock.LANDSCAPE);
+    }
+
+    switchToPortrait = async () => {
+        console.log('switchToPortrait');
+        //ScreenOrientation.allow(ScreenOrientation.Orientation.PORTRAIT);
+        ScreenOrientation.lockAsync(ScreenOrientation.OrientationLock.PORTRAIT);
+    }
+
+    switchToDefaultOrientation = async () => {
+        console.log('switchToDefaultOrientation');
+        ScreenOrientation.unlockAsync();
+    }
+
     getViewContent = () => {
         var content = null;
+
+        // if( this.state.videoList && this.state.videoList.length > 0 ){
+        //     content = (
+        //         <FlatList
+        //             data={this.state.videoList}
+        //             extraData={this.state.videoList}
+        //             ItemSeparatorComponent={ListItemSeparator}
+        //             renderItem={ ({item}) => (<VideoCardItem item={item} onPressHandler={() => {this.listItemClickHandler(item)}}/>) }
+        //             keyExtractor={(item, index) => index.toString()}
+        //             refreshControl={
+        //                 <RefreshControl refreshing={this.state.isFlatListRefreshing} onRefresh={this.flatListRefreshHandler} />
+        //             }
+        //         />
+        //     );
+        // }else{
+        //     content = (
+        //         <Card>
+        //             <Card.Content>
+        //                 <Title>There is no Videos at This Moment</Title>
+        //             </Card.Content>
+        //         </Card>
+        //     );
+        // }
+
         content = (
             <FlatList
                 data={this.state.videoList}
                 extraData={this.state.videoList}
-                // ItemSeparatorComponent={ListItemSeparator}
-                numColumns={numColumns}
-                renderItem={ ({item}) => (
-                    <VideoCardItem 
-                        item={item} 
-                        onPressHandler={() => {this.listItemClickHandler(item)}}
-                        viewStyle={styles.listItemView}
-                        contentStyle={styles.listItemContent}
-                    />
-                ) }
+                ItemSeparatorComponent={ListItemSeparator}
+                renderItem={ ({item}) => (<VideoCardItem item={item} onPressHandler={() => {this.listItemClickHandler(item)}}/>) }
                 keyExtractor={(item, index) => index.toString()}
                 refreshControl={
                     <RefreshControl 
@@ -137,7 +169,6 @@ class VideoListScreen extends Component {
                         // enabled={this.state.isOnReady}
                     />
                 }
-                columnWrapperStyle={styles.flatListColumnWrapperStyle}
             />
         );
 
@@ -155,35 +186,23 @@ class VideoListScreen extends Component {
     }
 
     render() {
+
         const content = this.getViewContent();
+
         return(
             <SafeAreaView style={styles.container}>
                 <View style={styles.contentContainer}>
+
                     {
                         ( this.state.isOnReady !== true ) && this._renderLoadingScreen( !this.state.isOnReady )
                     }
-                    {
-                        ( this.state.isOnReady === true ) && (
-                            <View>
-                                <TouchableOpacity onPress={() => console.log("onPress")}>
-                                    <Card>
-                                        <Card.Content>
-                                            <Title>MBC LIVE STREAMING</Title>
-                                            </Card.Content>
-                                                <Card.Cover source={logoImage} />
-                                            <Card.Content>
-                                            <Paragraph>Malawi Broadcasting Coporation, Watch Live</Paragraph>
-                                        </Card.Content>
-                                    </Card>
-                                </TouchableOpacity>
-                            </View>
-                        )
-                    }
+
                     {
                         ( this.state.isOnReady === true ) && (
                             content
                         )
                     }
+
                 </View>
             </SafeAreaView>
         );
@@ -192,10 +211,6 @@ class VideoListScreen extends Component {
 }
 
 const colors = Colors;
-
-const { width, height } = Dimensions.get('window');
-const numColumns = 3;
-const itemSize = width / numColumns;
 
 const styles = StyleSheet.create({
     container: {
@@ -207,24 +222,11 @@ const styles = StyleSheet.create({
 
     contentContainer: {
         flex: 1,
-        // paddingTop: Platform.OS === "android" ? StatusBar.currentHeight : 0,
+        // paddingTop: StatusBar.currentHeight || 0,
         // paddingTop: Constants.statusBarHeight || StatusBar.currentHeight || 0,
         flexDirection: "column",
-        justifyContent: 'center'
-    },
-
-    listItemContent: {
-        height: itemSize,
-        backgroundColor: colors.BabyPowder
-    },
-
-    listItemView: {
-        flex: (1 / numColumns), 
-        flexDirection: 'column', 
-        margin: 1
-    },
-
-    flatListColumnWrapperStyle: {}
+        justifyContent: 'center',
+    }
 });
 
 const mapStateToProps = (state) => {
