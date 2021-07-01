@@ -27,11 +27,7 @@ class AudioPlayerScreeen extends Component {
         this.state = {
             isPortrait: true,
             sound: null,
-            playerStatus: {
-                isBuffering: false,
-                isLoaded: false,
-                isPlaying: false
-            }
+            playbackStatus: {}
         };
 
         this.audioPlayerRef = React.createRef();
@@ -83,6 +79,47 @@ class AudioPlayerScreeen extends Component {
         }
     }
 
+    _onPlaybackStatusUpdate = ( playbackStatus ) => {
+        // console.log("playbackStatus", playbackStatus);
+        // if (!playbackStatus.isLoaded) {
+        //     if (playbackStatus.error) {
+        //         console.log("error", playbackStatus.error);
+        //     }
+        // }
+        this.setState((prevState) => {
+            return {
+                ...prevState,
+                playbackStatus: {
+                    ...playbackStatus
+                }
+            }
+        });
+
+        if( playbackStatus.isLoaded ){
+            console.log("isLoaded", playbackStatus.isLoaded);
+            if( playbackStatus.isPlaying ){
+                console.log("isPlaying", playbackStatus.isPlaying);
+            }else{
+                console.log("!isPlaying", !playbackStatus.isPlaying);
+            }
+
+            if( playbackStatus.isBuffering ){
+                console.log("isBuffering", playbackStatus.isBuffering);
+            }else{
+                console.log("!isBuffering", !playbackStatus.isBuffering);
+            }
+
+            if( playbackStatus.didJustFinish && !playbackStatus.isLooping ){
+                console.log("didJustFinish, !isLooping", playbackStatus.didJustFinish, !playbackStatus.isLooping);
+            }
+        }else{
+            console.log("!isLoaded", !playbackStatus.isLoaded);
+            if (playbackStatus.error) {
+                console.log("error", playbackStatus.error);
+            }
+        }
+    };
+
     _createSoundObject = async ( audio ) => {
         let result = null;
         try{
@@ -93,16 +130,8 @@ class AudioPlayerScreeen extends Component {
                     isLooping: false 
                 }
             );
-            this.setState((prevState) => {
-                return {
-                    ...prevState,
-                    sound: soundObject,
-                    playerStatus: {
-                        ...prevState.playerStatus,
-                        isLoaded: status.isLoaded
-                    }
-                }
-            });
+            soundObject.setOnPlaybackStatusUpdate(this._onPlaybackStatusUpdate);
+            this.setState({sound: soundObject});
         }catch(error){
             console.log("error", error);
         }
@@ -122,18 +151,10 @@ class AudioPlayerScreeen extends Component {
                         isLooping: false 
                     }
                 );
-                this.setState((prevState) => {
-                    return {
-                        ...prevState,
-                        sound: soundObject,
-                        playerStatus: {
-                            ...prevState.playerStatus,
-                            isLoaded: true
-                        }
-                    }
-                });
+                this.setState({sound: soundObject});
             }else{
                 let tempSoundObject = new Audio.Sound();
+                tempSoundObject.setOnPlaybackStatusUpdate(this._onPlaybackStatusUpdate);
                 result = await tempSoundObject.loadAsync(
                     { uri: audio.audio_uri }, 
                     { 
@@ -141,16 +162,7 @@ class AudioPlayerScreeen extends Component {
                         isLooping: false 
                     }
                 );
-                this.setState((prevState) => {
-                    return {
-                        ...prevState,
-                        sound: tempSoundObject,
-                        playerStatus: {
-                            ...prevState.playerStatus,
-                            isLoaded: true
-                        }
-                    }
-                });
+                this.setState({sound: tempSoundObject});
             }
         }catch(error){
             console.log("error", error);
@@ -185,16 +197,7 @@ class AudioPlayerScreeen extends Component {
             const { sound: soundObject } = this.state;
             if( soundObject !== null ){
                 result = await soundObject.playAsync();
-                this.setState((prevState) => {
-                    return {
-                        ...prevState,
-                        sound: soundObject,
-                        playerStatus: {
-                            ...prevState.playerStatus,
-                            isPlaying: true
-                        }
-                    }
-                });
+                // this.setState({sound: soundObject});
             }
         }catch(error){
             console.log("error", error);
@@ -209,16 +212,7 @@ class AudioPlayerScreeen extends Component {
             const { sound: soundObject } = this.state;
             if( soundObject !== null ){
                 result = await soundObject.replayAsync();
-                this.setState((prevState) => {
-                    return {
-                        ...prevState,
-                        sound: soundObject,
-                        playerStatus: {
-                            ...prevState.playerStatus,
-                            isPlaying: true
-                        }
-                    }
-                });
+                // this.setState({sound: soundObject});
             }
         }catch(error){
             console.log("error", error);
@@ -233,16 +227,7 @@ class AudioPlayerScreeen extends Component {
             const { sound: soundObject } = this.state;
             if( soundObject !== null ){
                 result = await soundObject.pauseAsync();
-                this.setState((prevState) => {
-                    return {
-                        ...prevState,
-                        sound: soundObject,
-                        playerStatus: {
-                            ...prevState.playerStatus,
-                            isPlaying: false
-                        }
-                    }
-                });
+                // this.setState({sound: soundObject});
             }
         }catch(error){
             console.log("error", error);
@@ -257,16 +242,7 @@ class AudioPlayerScreeen extends Component {
             const { sound: soundObject } = this.state;
             if( soundObject !== null ){
                 result = await soundObject.stopAsync();
-                this.setState((prevState) => {
-                    return {
-                        ...prevState,
-                        sound: soundObject,
-                        playerStatus: {
-                            ...prevState.playerStatus,
-                            isPlaying: false
-                        }
-                    }
-                });
+                // this.setState({sound: soundObject});
             }
         }catch(error){
             console.log("error", error);
@@ -290,11 +266,11 @@ class AudioPlayerScreeen extends Component {
             <SafeAreaView style={styles.container}>
                 <View style={styles.contentContainer}>
                     {
-                        ( this.state.playerStatus.isLoaded !== true ) && this._renderLoadingScreen( !this.state.playerStatus.isLoaded )
+                        ( this.state.playbackStatus.isLoaded !== true ) && this._renderLoadingScreen( !this.state.playbackStatus.isLoaded )
                     }
 
                     {
-                        ( this.state.playerStatus.isLoaded === true ) && (
+                        ( this.state.playbackStatus.isLoaded === true ) && (
                             <React.Fragment>
                                 <View style={{ alignItems: "center" }}>
                                     <View style={styles.coverContainer}>
@@ -303,13 +279,17 @@ class AudioPlayerScreeen extends Component {
                                 </View>
 
                                 <View style={{ flexDirection: "row", justifyContent: "center", alignItems: "center", marginTop: 16 }}>
-                                    <TouchableOpacity onPress={this._pauseSoundObject}>
+                                    <TouchableOpacity 
+                                        disabled={!this.state.playbackStatus.isPlaying} 
+                                        onPress={this._pauseSoundObject}
+                                    >
                                         <FontAwesome5 name="pause" size={32} color="#93A8B3"></FontAwesome5>
                                     </TouchableOpacity>
                                     <TouchableOpacity 
+                                        disabled={this.state.playbackStatus.isPlaying} 
                                         onPress={this._playSoundObject} 
                                         style={[styles.playButtonContainer, {
-                                            borderColor: ( this.state.playerStatus.isPlaying === true ) ? colors.green300 : colors.red300
+                                            borderColor: ( this.state.playbackStatus.isPlaying === true ) ? colors.green300 : colors.red300
                                         }]}
                                     >
                                         <FontAwesome5
@@ -319,7 +299,10 @@ class AudioPlayerScreeen extends Component {
                                             style={[styles.playButton, { marginLeft: 8 }]}
                                         ></FontAwesome5>
                                     </TouchableOpacity>
-                                    <TouchableOpacity onPress={this._stopSoundObject}>
+                                    <TouchableOpacity 
+                                        disabled={!this.state.playbackStatus.isPlaying} 
+                                        onPress={this._stopSoundObject}
+                                    >
                                         <FontAwesome5 name="stop" size={32} color="#93A8B3"></FontAwesome5>
                                     </TouchableOpacity>
                                 </View>
