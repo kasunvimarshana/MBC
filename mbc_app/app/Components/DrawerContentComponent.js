@@ -44,7 +44,7 @@ const DrawerContentComponent = ( props ) => {
                 screen: 'AudioPlayerScreeen',
                 initial: true,
                 params: {
-                    audio: {audio_uri: ''}
+                    audio: {audio_uri: 'http://154.66.125.13:88/broadwavehigh.mp3?src=1'}
                 }
             }
         });
@@ -58,7 +58,7 @@ const DrawerContentComponent = ( props ) => {
                 screen: 'AudioPlayerScreeen',
                 initial: true,
                 params: {
-                    audio: {audio_uri: ''}
+                    audio: {audio_uri: 'http://154.66.125.13:86/broadwavehigh.mp3?src=1'}
                 }
             }
         });
@@ -123,7 +123,7 @@ const styles = StyleSheet.create({
         height: "100%",
         backgroundColor: colors.background,
         paddingTop: 40,
-        color: colors.text
+        color: colors.black
     },
 
     profileHeader: {
@@ -137,7 +137,7 @@ const styles = StyleSheet.create({
         width: 60,
         height: 60,
         borderRadius: 60 / 2,
-        color: colors.text,
+        color: colors.black,
         backgroundColor: colors.TiffanyBlue,
         textAlign: "center",
         justifyContent: "center",
@@ -146,11 +146,11 @@ const styles = StyleSheet.create({
 
     profileHeaderTextCircle: {
         fontSize: 25, 
-        color: colors.text
+        color: colors.black
     },
 
     profileHeaderText: {
-        color: colors.text,
+        color: colors.black,
         alignSelf: "center",
         paddingHorizontal: 10,
         fontWeight: "bold",
@@ -164,7 +164,7 @@ const styles = StyleSheet.create({
     },
 
     drawerItemLabelText: {
-        color: colors.text
+        color: colors.black
     }
 
 });

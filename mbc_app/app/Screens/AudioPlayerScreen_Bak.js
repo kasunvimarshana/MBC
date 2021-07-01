@@ -7,13 +7,14 @@ import {
     Dimensions,
     ScrollView,
     Platform,
-    StatusBar
+    StatusBar,
+    Button
 } from 'react-native';
 import { 
     Colors,
     Text,
     Avatar, 
-    Button, 
+    // Button, 
     Card, 
     Title, 
     Paragraph,
@@ -22,15 +23,13 @@ import {
 } from 'react-native-paper';
 import { FontAwesome, Ionicons } from '@expo/vector-icons';
 import { connect } from 'react-redux';
-import { Video } from 'expo-av';
-import VideoPlayer from 'expo-video-player';
+import { Audio } from 'expo-av';
 import * as ScreenOrientation from 'expo-screen-orientation';
 import { activateKeepAwake, deactivateKeepAwake } from 'expo-keep-awake';
-import YoutubePlayer from '../Components/YoutubePlayer';
 
 const logoImage = require('../Assets/logo-removebg.png');
 
-class VideoPlayerScreen extends Component {
+class AudioPlayerScreeen extends Component {
 
     state = {};
     _isMounted = false;
@@ -41,17 +40,17 @@ class VideoPlayerScreen extends Component {
             isPortrait: true
         };
 
-        this.videoPlayerRef = React.createRef();
+        this.audioPlayerRef = React.createRef();
     }
 
-    _handleVideoPlayerRef = (component) => {
-        this.videoPlayerRef = component;
+    _handleAudioPlayerRef = (component) => {
+        this.audioPlayerRef = component;
     }
 
-    getSelectedVideo = () => {
-        const { video } = this.props.route.params;
-        video.uri = {uri: video.video_uri};
-        return video;
+    getSelectedAudio = () => {
+        const { audio } = this.props.route.params;
+        audio.uri = {uri: audio.audio_uri};
+        return audio;
     }
 
     errorCallbackHandler = ( error ) => {
@@ -70,52 +69,27 @@ class VideoPlayerScreen extends Component {
         this._deactivate();
     }
 
-    _renderVideoPlayer = ( video ) => {
-        const icon = (name, size = 36) => () => (
-            <Ionicons
-                name={name}
-                size={size}
-                color={Colors.teal500}
-                style={{ textAlign: 'center' }}
-            />
-        );
+    _renderAudioPlayer = ( audio ) => {
         return (
-            <VideoPlayer
-                videoProps={{
-                    shouldPlay: false,
-                    resizeMode: Video.RESIZE_MODE_CONTAIN,
-                    source: video.uri,
-                    rate: 1.0,
-                    volume: 1.0,
-                    isMuted: false,
-                    isLooping: false,
-                    videoRef: this._handleVideoRef,
-                }}
-                isPortrait={this.state.isPortrait}
-                playFromPositionMillis={0}
-                inFullscreen={true}
-                debug={false}
-                errorCallback={(error) => { this.errorCallbackHandler(error) }}
-            />
-        );
-    }
-
-    _renderYoutubePlayer = ( video ) => {
-        return (
-            <YoutubePlayer
-                videoId={video.video_uri}
-            />
+            <View style={{ flexDirection: 'row', alignSelf: 'stretch', justifyContent: 'space-around' }}>
+                <Button
+                    title='Play'
+                    onPress={() => this.onPlay()}
+                    color='red'
+                />
+                <Button
+                    title='Pause'
+                    onPress={() => this.onPause()}
+                    color='red'
+                />
+            </View>
         );
     }
 
     _renderPlayer = () => {
-        const video = this.getSelectedVideo();
-        //console.log('video', video);
-        if( (video) && ( String(video.type).localeCompare("youtube") === 0) ){
-            return this._renderYoutubePlayer(video);
-        }else{
-            return this._renderVideoPlayer(video);
-        }
+        const audio = this.getSelectedAudio();
+        console.log('audio', audio);
+        return this._renderAudioPlayer(audio);
     }
 
     _activate = () => {
@@ -125,6 +99,26 @@ class VideoPlayerScreen extends Component {
     _deactivate = () => {
         deactivateKeepAwake(); 
     };
+
+    _play = async () => {
+        try {
+            const audio = this.getSelectedAudio();
+            console.log('audio', audio);
+            const { sound: soundObject, status } = await Audio.Sound.createAsync(
+                { uri: audio.audio_uri }, 
+                { 
+                    shouldPlay: true,
+                    isLooping: false 
+                }
+            );
+            if( soundObject !== null ){
+                await sound.playAsync();
+                await sound.unloadAsync();
+            }
+        } catch (error) {
+            console.log("error", error);
+        }
+    }
 
     render() {
         return(
@@ -144,7 +138,7 @@ const styles = StyleSheet.create({
         flex: 1,
         justifyContent: 'center',
         alignItems: 'stretch',
-        backgroundColor: "#EAEAEC"
+        backgroundColor: colors.lightBlueA100
     },
 
     contentContainer: {
@@ -152,7 +146,7 @@ const styles = StyleSheet.create({
         // paddingTop: StatusBar.currentHeight || 0,
         // paddingTop: Constants.statusBarHeight || StatusBar.currentHeight || 0,
         // flexDirection: "column",
-        // justifyContent: 'center',
+        justifyContent: 'center',
     },
 
     player: {
@@ -168,4 +162,4 @@ const mapDispatchToProps = (dispatch) => {
     return {};
 };
 
-export default connect(mapStateToProps, mapDispatchToProps)(VideoPlayerScreen);
+export default connect(mapStateToProps, mapDispatchToProps)(AudioPlayerScreeen);

@@ -179,7 +179,7 @@ class VideoListScreen extends Component {
         return (
             <LoadingComponent 
                 animating={isAnimating} 
-                color={Colors.red800} 
+                color={colors.red800} 
                 size='large'
             />
         );
@@ -194,10 +194,14 @@ class VideoListScreen extends Component {
                 <View style={styles.contentContainer}>
 
                     {
-                        ( this.state.isOnReady === false ) && this._renderLoadingScreen( !this.state.isOnReady )
+                        ( this.state.isOnReady !== true ) && this._renderLoadingScreen( !this.state.isOnReady )
                     }
 
-                    {content}
+                    {
+                        ( this.state.isOnReady === true ) && (
+                            content
+                        )
+                    }
 
                 </View>
             </SafeAreaView>
@@ -213,7 +217,7 @@ const styles = StyleSheet.create({
         flex: 1,
         justifyContent: 'center',
         alignItems: 'stretch',
-        backgroundColor: colors.lightBlueA100
+        backgroundColor: "#EAEAEC"
     },
 
     contentContainer: {

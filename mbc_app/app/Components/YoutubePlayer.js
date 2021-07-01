@@ -96,7 +96,7 @@ const YoutubePlayer = ( props ) => {
         return (
             <LoadingComponent 
                 animating={isAnimating} 
-                color={Colors.red800} 
+                color={colors.red800} 
                 size='large'
             />
         );
