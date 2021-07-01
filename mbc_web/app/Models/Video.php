@@ -13,7 +13,8 @@ class Video extends Model
         'name',
         'video_uri',
         'image_uri',
-        'description'
+        'description',
+        'type'
     ];
 
     public function format(){
@@ -27,5 +28,14 @@ class Video extends Model
 
     public function getFormattedImageUri(){
         return asset( $this->image_uri );
+    }
+    
+    public function formatVideoUri(){
+        if( ($this->video_uri) && ( strcasecmp($this->type, 'youtube') === 0 ) ){
+            $url_components = parse_url( $this->video_uri ); 
+            parse_str($url_components['query'], $params); 
+            $this->video_uri = ($params && $params["v"]) ? $params["v"] : $this->video_uri;
+        }
+        return $this;
     }
 }

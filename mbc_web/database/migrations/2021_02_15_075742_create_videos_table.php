@@ -19,6 +19,7 @@ class CreateVideosTable extends Migration
 
             $table->string('name');
             $table->string('video_uri');
+            $table->string('type')->nullable()->default('m3u8');
             $table->text('image_uri')->nullable();
             $table->text('description')->nullable();
         });
