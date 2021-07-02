@@ -39,6 +39,10 @@
                                 </li>
 
                                 <li class="nav-item">
+                                    <a class="nav-link active" href="{{ route('liveStream.create', []) }}"> Add Live Streams </a>
+                                </li>
+
+                                <li class="nav-item">
                                     <a class="nav-link active" href="{!! route('login.logout') !!}" onclick="return confirm('Are you sure?')">
                                         <span class="glyphicon glyphicon-log-out"></span> <span> Logout </span>
                                     </a>

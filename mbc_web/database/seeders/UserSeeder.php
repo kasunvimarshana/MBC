@@ -20,7 +20,7 @@ class UserSeeder extends Seeder
         User::create([
             'name' => 'globemwadmin',
             'email' => 'admin@globemw.net',
-            'password' => Hash::make('admin@globemw@net')
+            'password' => Hash::make('admin@globemw.net')
         ]);
     }
 }

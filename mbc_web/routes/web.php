@@ -28,6 +28,9 @@ Route::group(['middleware' => ['authMiddleware']], function(){
     Route::get('/videos/show/{video}', [App\Http\Controllers\VideoController::class, 'show'])->name('video.show');
     Route::get('/videos', [App\Http\Controllers\VideoController::class, 'index'])->name('videos');
 
+    Route::get('/live-streams/create', [App\Http\Controllers\LiveStreamController::class, 'create'])->name('liveStream.create');
+    Route::post('/live-streams/store', [App\Http\Controllers\LiveStreamController::class, 'createOrUpdate'])->name('liveStream.store');
+
     Route::get('/linkstorage', function(){
         Artisan::call('storage:link');
     });
@@ -36,11 +39,17 @@ Route::group(['middleware' => ['authMiddleware']], function(){
 });
 
 Route::get('/videos/all/json', [App\Http\Controllers\VideoController::class, 'getAllJson'])->name('video.getAllJson');
-
-
-Route::get('/', function(){
-    return view('video.home');
-})->name('home');
-
 Route::get('/login', [App\Http\Controllers\AuthController::class, 'create'])->name('login.create');
 Route::post('/login', [App\Http\Controllers\AuthController::class, 'login'])->name('login.login');
+
+// Route::get('/', function(){
+//     return view('video.home');
+// })->name('home');
+
+Route::get('/', [App\Http\Controllers\VideoController::class, 'home'])->name('home');
+
+/*Route::get('/app/setup', function(){
+    Artisan::call('storage:link');
+    Artisan::call('migrate:fresh --seed');
+    echo "Setup!!!";
+});*/

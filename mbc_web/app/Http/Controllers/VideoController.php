@@ -16,6 +16,19 @@ class VideoController extends Controller
         $this->storage_uri = env('STORAGE_URI', 'mbc_images');
     }
 
+    public function home(){
+        $ip = $_SERVER['REMOTE_ADDR'];
+        $json = file_get_contents('http://www.geoplugin.net/json.gp?ip='.$ip);
+        //dd($json);
+        $arr = json_decode($json);
+        if($arr->geoplugin_countryCode == 'MW'){
+            return view('video.home');
+        }else{
+            return view('video.home_blocked');
+        }
+        
+    }
+
     /**
      * Display a listing of the resource.
      *
@@ -64,7 +77,7 @@ class VideoController extends Controller
         $validator = Validator::make($request->all(), $rules);
 
         if($validator->fails()){
-            //
+            return redirect()->back()->with('error', 'Error');
         }else{
             $data = [
                 'name' => $request->input('name'),
@@ -134,7 +147,7 @@ class VideoController extends Controller
         $validator = Validator::make($request->all(), $rules);
 
         if($validator->fails()){
-            //
+            return redirect()->back()->with('error', 'Error');
         }else{
             $data = [
                 'name' => $request->input('name'),
@@ -200,7 +213,7 @@ class VideoController extends Controller
 
     private function getVideos(Request $request){
         $offset = 0;
-        $limit = 10;
+        $limit = 10; //$limit = PHP_INT_MAX;
         $page = 0;
         $videos = Video::orderBy('id', 'desc');
         if( $request->has('limit') && $request->filled('limit') ){
