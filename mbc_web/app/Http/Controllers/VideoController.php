@@ -19,11 +19,12 @@ class VideoController extends Controller
     /**
      * Display a listing of the resource.
      *
+     * @param  \Illuminate\Http\Request  $request
      * @return \Illuminate\Http\Response
      */
-    public function index()
+    public function index(Request $request)
     {
-        $videos = Video::orderBy('id', 'desc')->get();
+        $videos = $this->getVideos( $request );
         $formatted_videos = $videos->map(function( $video ){
             return $video->format();
         });
@@ -183,7 +184,8 @@ class VideoController extends Controller
     }
 
     public function getAllJson(Request $request){
-        $videos = Video::orderBy('id', 'desc')->get();
+        $request->input('name');
+        $videos = $this->getVideos( $request );
         $formatted_videos = $videos->map(function( $video ){
             return $video->format();
         });
@@ -194,5 +196,27 @@ class VideoController extends Controller
 
         //dd(url('mbc_images/logo.png'));
         return response()->json( $data );
+    }
+
+    private function getVideos(Request $request){
+        $offset = 0;
+        $limit = 10;
+        $page = 0;
+        $videos = Video::orderBy('id', 'desc');
+        if( $request->has('limit') && $request->filled('limit') ){
+            $limit = abs(intval( $request->input('limit') ));
+        }
+        if( $request->has('offset') && $request->filled('offset') ){
+            $offset = abs(intval( $request->input('offset') ));
+        }
+        if( $request->has('page') && $request->filled('page') ){
+            $page = abs(intval( $request->input('page') ));
+            $offset = abs(($page - 1) * $limit);
+        }
+        if( $request->has('paginate') && $request->filled('paginate') ){
+            $videos = $videos->skip( $offset )->take( $limit );
+        }
+        $videos = $videos->get();
+        return $videos;
     }
 }
