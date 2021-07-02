@@ -16,7 +16,7 @@
 <script>
     Swal.fire({
         position: 'top-end',
-        icon: 'error',
+        icon: 'danger',
         title: 'Error',
         text: "{{ session()->get('error') }}",
         showConfirmButton: false,

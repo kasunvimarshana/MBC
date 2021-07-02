@@ -1,0 +1,7 @@
+# app
+mbc_app/node_modules/**/*
+
+# web
+mbc_web/vendor/**/*
+mbc_web/node_modules/**/*
+mbc_web/public/storage/**/*

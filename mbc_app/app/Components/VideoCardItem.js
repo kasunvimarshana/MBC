@@ -27,7 +27,7 @@ const VideoCardItem = ({item, onPressHandler, viewStyle, contentStyle}) => {
     const featuredImage = (item.image_uri) ? {'uri' : item.image_uri} : logoImage;
 
     const cardOnPressHandler = () => {
-        // onPressHandler();
+        onPressHandler();
     };
 
     return (

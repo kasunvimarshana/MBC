@@ -41,7 +41,9 @@ class VideoListScreen extends Component {
         this.state = {
             videoList: [],
             isFlatListRefreshing: false,
-            isOnReady: false
+            isOnReady: false,
+            offset: 0,
+            limit: 10
         };
     }
 

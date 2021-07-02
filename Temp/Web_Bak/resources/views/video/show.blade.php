@@ -6,7 +6,7 @@
 <div class="container">
     <div class="card-deck">
         @php
-            $temp_placehold_image = ($video->image_uri !== asset(null)) ? $video->image_uri : $placehold_image;
+            $temp_placehold_image = ($video->image_uri) ? $video->image_uri : $placehold_image;
         @endphp
 
         <div class="card my-4">

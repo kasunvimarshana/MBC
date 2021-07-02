@@ -9,7 +9,7 @@
         <!-- div class="w-100 d-none d-md-block d-lg-none"></div -->
         @foreach($videos as $video)
         @php
-            $temp_placehold_image = ($video->image_uri) ? $video->image_uri : $placehold_image;
+            $temp_placehold_image = ($video->image_uri !== asset(null)) ? $video->image_uri : $placehold_image;
         @endphp
         <div class="card my-4"><!-- style="width: 18rem;" -->
             <img class="card-img-top img-fluid" src="{{ $temp_placehold_image }}" alt="{{ $video->name }}">
