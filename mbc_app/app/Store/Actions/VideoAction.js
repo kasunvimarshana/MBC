@@ -1,10 +1,13 @@
 import { 
     GET_VIDEOS_FROM_REMOTE_API
 } from '../Actions/ActionType';
-
 import {
     REMOTE_VIDEO_API_URI
 } from '../../Constants/AppConstants';
+import { 
+    buildURLWithQueryString, 
+    getOrigin 
+} from '../../Helpers/HTTPHelper';
 
 
 export const getAllVideos = () => {
@@ -46,13 +49,49 @@ export const getAllVideos = () => {
     };
 };
 
-export const getVideos = (isPaginate = true, page = 1, limit = 10) => { 
+export const getVideos = ( is_paginate = true, page = 1, limit = 10 ) => { 
     return (dispatch, getState) => {
         let videoList = new Array();
         const promise = new Promise((resolve, reject) => {
-            fetch( REMOTE_VIDEO_API_URI , {
-                method: 'GET'
+            let remote_api_origin = null;
+            let remote_api_uri = null;
+            let fetchData = {};
+            Promise.resolve({
+                _remote_api_origin: REMOTE_VIDEO_API_URI,
             })
+            .then( ( { _remote_api_origin } ) => {
+                remote_api_origin = _remote_api_origin;
+                remote_api_uri = `${remote_api_origin}`;
+            }, (error) => {
+                throw new Error( error );
+            } )
+            .then( () => {
+                let queryParameters = {
+                    is_paginate: is_paginate,
+                    page: page,
+                    limit: limit
+                };
+
+                fetchData = {
+                    method: "GET",
+                    //body: JSON.stringify( queryParameters ),
+                    headers: { 
+                        "Accept": "application/json",
+                        "Content-Type": "application/json",
+                        "Connection": "close" 
+                    },
+                    //mode: "cors", //no-cors, *cors, same-origin
+                    //credentials: "include", //include, *same-origin, omit
+                    //cache: "default", //*default, no-cache, reload, force-cache, only-if-cached
+                    //redirect: 'follow', // manual, *follow, error
+                    //referrerPolicy: 'no-referrer', // no-referrer, *no-referrer-when-downgrade, origin, origin-when-cross-origin, same-origin, strict-origin, strict-origin-when-cross-origin, unsafe-url
+                    Origin: getOrigin( remote_api_origin ),
+                };
+
+                const api_url = buildURLWithQueryString(remote_api_uri + "/videos/all/json", queryParameters);
+                console.log("api_url", api_url);
+                return fetch(api_url, fetchData);
+            } )
             .then(async (response) => {
                 if( response.status !== 200 ){
                     throw new Error( response.status );
@@ -64,21 +103,22 @@ export const getVideos = (isPaginate = true, page = 1, limit = 10) => {
                 //console.log('error', error);
                 throw new Error( error );
             })
-            .then((json) => {
-                //console.log(json);
-                if( json && Object.keys(json).length > 0 ){
-                    Object.entries(json.videos).forEach(([key, value]) => {
-                        //console.log(key , value);
-                        //value.key = key;
+            .then(async (json) => {
+                //console.log('json', json);
+                let data = json;
+                if( data && Object.keys(data).length > 0 ){
+                    Object.entries(data.videos).forEach(([key, value]) => {
                         videoList.push( value );
                     });
                 }
-                //console.log(videoList);
-                resolve(videoList);
+                return resolve(videoList);
             })
             .catch((error) => {
-                console.log("catch", error);
-                reject(error);
+                console.log('error', error);
+                return reject( error.message );
+            })
+            .finally(() => {
+                //console.log("finally");
             });
         });
         return promise;

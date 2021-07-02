@@ -26,7 +26,7 @@ import { FontAwesome } from '@expo/vector-icons';
 import { connect } from 'react-redux';
 import * as ScreenOrientation from 'expo-screen-orientation';
 
-import { getAllVideos } from '../Store/Actions/VideoAction';
+import { getVideos } from '../Store/Actions/VideoAction';
 import VideoCardItem from '../Components/VideoCardItem';
 import ListItemSeparator from '../Components/ListItemSeparator';
 import LoadingComponent from '../Components/LoadingComponent';
@@ -42,38 +42,45 @@ class VideoListScreen extends Component {
             videoList: [],
             isFlatListRefreshing: false,
             isOnReady: false,
-            offset: 0,
-            limit: 10
+            page: 1
         };
     }
 
-    fetchVideoData = async () => {
-        //return this.props.ui_GetAllVideos();
-        this.setState({isFlatListRefreshing: true})
-        this.props.ui_GetAllVideos()
-        .then(( videoList ) => {
-            this.setState((prevState) => {
-                return {
-                    ...prevState,
-                    videoList: videoList,
-                    isFlatListRefreshing: false
-                }
-            });
-        }, (error) => {
-            //console.log('error', error);
-            throw new Error( error );
-        })
-        .catch((error) => {
+    _fetchData = async () => {
+        let videoList = new Array();
+        try{
+            videoList = await this.props.ui_getVideos(true, this.state.page);
+        }catch( error ){
             console.log("error", error);
-        })
-        .finally(() => {
-            this.setState({ isFlatListRefreshing: false });
+        }
+        return videoList;
+    }
+
+    loadData = async () => {
+        let page = 1;
+        let _data = new Array();
+        this.setState({ page: page }, console.log('page', page));
+        _data = await this._fetchData(true, this.state.page);
+        this.setState({ videoList: _data });
+    }
+
+    loadMoreData = async () => {
+        let page = (this.state.page + 1);
+        let _data = new Array();
+        this.setState({ page: page }, console.log('page', page));
+        _data = await this._fetchData(true, this.state.page);
+        this.setState((prevState) => {
+            return {
+                ...prevState,
+                // videoList: [..._data, ...prevState.videoList],
+                videoList: [].concat(_data, prevState.videoList)
+            }
         });
-    };
+    }
 
     componentDidMount() {
         this.backHandler = BackHandler.addEventListener('hardwareBackPress', this.backOnPressHandler);
-        this.fetchVideoData()
+        this.loadData()
         .finally(() => {
             this.setState({ isOnReady: true });
         });
@@ -98,7 +105,11 @@ class VideoListScreen extends Component {
     componentDidUpdate( prevProps ){ }
 
     flatListRefreshHandler = () => {
-        this.fetchVideoData();
+        this.setState({isFlatListRefreshing: true});
+        this.loadData()
+            .finally(() => {
+                this.setState({isFlatListRefreshing: false});
+            });
     }
 
     listItemClickHandler = (item) => {
@@ -235,7 +246,7 @@ const mapStateToProps = (state) => {
 
 const mapDispatchToProps = (dispatch) => {
     return {
-        ui_GetAllVideos: () => dispatch(getAllVideos())
+        ui_getVideos: ( is_paginate = true, page = 1, limit = 10 ) => dispatch(getVideos( is_paginate, page, limit ))
     };
 };
 
