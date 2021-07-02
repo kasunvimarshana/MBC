@@ -46,7 +46,7 @@ export const getAllVideos = () => {
     };
 };
 
-export const getVideos = (limit = 10, offset = 0) => {
+export const getVideos = (isPaginate = true, page = 1, limit = 10) => { 
     return (dispatch, getState) => {
         let videoList = new Array();
         const promise = new Promise((resolve, reject) => {

@@ -226,7 +226,7 @@ class VideoController extends Controller
             $page = abs(intval( $request->input('page') ));
             $offset = abs(($page - 1) * $limit);
         }
-        if( $request->has('paginate') && $request->filled('paginate') ){
+        if( $request->has('paginate') && $request->filled('paginate') && $this->is_true($request->input('paginate')) ){
             $videos = $videos->skip( $offset )->take( $limit );
         }
         $videos = $videos->get();
