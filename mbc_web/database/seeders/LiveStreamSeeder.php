@@ -16,19 +16,21 @@ class LiveStreamSeeder extends Seeder
     public function run()
     {
         //
-        LiveStream::create([
-            'name' => 'MBC_Live_Streaming',
-            'title' => null
-        ]);
+        LiveStream::truncate();
 
-        LiveStream::create([
-            'name' => 'Radio_1',
-            'title' => null
-        ]);
+        LiveStream::updateOrCreate(
+            ['name' => 'MBC_Live_Streaming'],
+            ['name' => 'MBC_Live_Streaming', 'title' => 'MBC LIVE STREAMING']
+        );
 
-        LiveStream::create([
-            'name' => 'Radio_2',
-            'title' => null
-        ]);
+        LiveStream::updateOrCreate(
+            ['name' => 'Radio_1'],
+            ['name' => 'Radio_1', 'title' => 'RADIO 1']
+        );
+
+        LiveStream::updateOrCreate(
+            ['name' => 'Radio_2'],
+            ['name' => 'Radio_2', 'title' => 'RADIO 2']
+        );
     }
 }
