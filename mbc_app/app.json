@@ -28,7 +28,12 @@
         "backgroundColor": "#FFFFFF"
       },
       "package": "com.kasunv.mbc_app",
-      "permissions": [ "CAMERA", "WRITE_EXTERNAL_STORAGE", "CAMERA_ROLL", "RECORD_AUDIO" ]
+      "permissions": [
+        "CAMERA",
+        "WRITE_EXTERNAL_STORAGE",
+        "CAMERA_ROLL",
+        "RECORD_AUDIO"
+      ]
     },
     "web": {
       "favicon": "./assets/favicon.png"

@@ -9,12 +9,13 @@ import {
 } from 'react-native-paper';
 import { FontAwesome, Ionicons } from '@expo/vector-icons';
 import { connect } from 'react-redux';
+import { Video } from 'expo-av';
+import VideoPlayer from 'expo-video-player';
 import * as ScreenOrientation from 'expo-screen-orientation';
 import { activateKeepAwake, deactivateKeepAwake } from 'expo-keep-awake';
 
 import { getLiveStreams } from '../Store/Actions/LiveStreamAction';
 import LoadingComponent from '../Components/LoadingComponent';
-import VideoPlayerComponent from '../Components/VideoPlayerComponent';
 
 class LiveStreamVideoPlayerScreen extends Component {
 
@@ -25,9 +26,12 @@ class LiveStreamVideoPlayerScreen extends Component {
         super( props );
         this.state = {
             isPortrait: true,
+            playbackStatus: {},
             video: null,
             isOnReady: false,
         };
+
+        this.videoPlayerRef = React.createRef();
     }
 
     _fetchData = async () => {
@@ -48,11 +52,23 @@ class LiveStreamVideoPlayerScreen extends Component {
         this.setState({ video: video }, console.log('video', video));
     }
 
+    _handleVideoPlayerRef = (component) => {
+        this.videoPlayerRef.current = component;
+        if( (this.videoPlayerRef) && (this.videoPlayerRef.current) ){
+            this.videoPlayerRef.current.setOnPlaybackStatusUpdate(this._onPlaybackStatusUpdate);
+        }
+    }
+
     getSelectedVideo = () => {
         const { video } = this.state;
         video.video_uri = video.uri;
         video.uri = {uri: video.uri};
         return video;
+    }
+
+    errorCallbackHandler = ( error ) => {
+        //console.error('Error: ', error.message, error.type, error.obj);
+        console.error('errorCallbackHandler', error);
     }
 
     UNSAFE_componentWillMount() {}
@@ -71,13 +87,65 @@ class LiveStreamVideoPlayerScreen extends Component {
         this._deactivate();
     }
 
+    _onPlaybackStatusUpdate = ( playbackStatus ) => {
+        // console.log("playbackStatus", playbackStatus);
+        // if (!playbackStatus.isLoaded) {
+        //     if (playbackStatus.error) {
+        //         console.log("error", playbackStatus.error);
+        //     }
+        // }
+        this.setState((prevState) => {
+            return {
+                ...prevState,
+                playbackStatus: {
+                    ...playbackStatus
+                }
+            }
+        });
+
+        if( playbackStatus.isLoaded ){
+            console.log("isLoaded", playbackStatus.isLoaded);
+            if( playbackStatus.isPlaying ){
+                console.log("isPlaying", playbackStatus.isPlaying);
+            }else{
+                console.log("!isPlaying", !playbackStatus.isPlaying);
+            }
+
+            if( playbackStatus.isBuffering ){
+                console.log("isBuffering", playbackStatus.isBuffering);
+            }else{
+                console.log("!isBuffering", !playbackStatus.isBuffering);
+            }
+
+            if( playbackStatus.didJustFinish && !playbackStatus.isLooping ){
+                console.log("didJustFinish, !isLooping", playbackStatus.didJustFinish, !playbackStatus.isLooping);
+            }
+        }else{
+            console.log("!isLoaded", !playbackStatus.isLoaded);
+            if (playbackStatus.error) {
+                console.log("error", playbackStatus.error);
+            }
+        }
+    };
+
     _renderVideoPlayer = ( video ) => {
         return (
-            <VideoPlayerComponent 
+            <VideoPlayer
                 videoProps={{
+                    shouldPlay: false,
+                    resizeMode: Video.RESIZE_MODE_CONTAIN,
                     source: video.uri,
+                    rate: 1.0,
+                    volume: 1.0,
+                    isMuted: false,
+                    isLooping: false,
+                    ref: (component) => { this._handleVideoPlayerRef(component) }
                 }}
-                playerProps={{}}
+                isPortrait={this.state.isPortrait}
+                playFromPositionMillis={0}
+                inFullscreen={true}
+                debug={false}
+                errorCallback={(error) => { this.errorCallbackHandler(error) }}
             />
         );
     }

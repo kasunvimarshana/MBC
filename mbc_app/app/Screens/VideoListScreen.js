@@ -27,6 +27,7 @@ import { connect } from 'react-redux';
 import * as ScreenOrientation from 'expo-screen-orientation';
 
 import { getVideos } from '../Store/Actions/VideoAction';
+import { getLiveStreams } from '../Store/Actions/LiveStreamAction';
 import VideoCardItem from '../Components/VideoCardItem';
 import ListItemSeparator from '../Components/ListItemSeparator';
 import LoadingComponent from '../Components/LoadingComponent';
@@ -323,7 +324,8 @@ const mapStateToProps = (state) => {
 
 const mapDispatchToProps = (dispatch) => {
     return {
-        ui_getVideos: ( is_paginate = true, page = 1, limit = 10 ) => dispatch(getVideos( is_paginate, page, limit ))
+        ui_getVideos: ( is_paginate = true, page = 1, limit = 10 ) => dispatch(getVideos( is_paginate, page, limit )),
+        ui_getLiveStreams: ( name = null ) => dispatch(getLiveStreams( name )) 
     };
 };
 

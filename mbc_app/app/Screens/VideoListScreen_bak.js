@@ -8,7 +8,8 @@ import {
     RefreshControl,
     Dimensions,
     StatusBar,
-    BackHandler 
+    BackHandler ,
+    Platform
 } from 'react-native';
 import { 
     Colors,
@@ -25,7 +26,7 @@ import { FontAwesome } from '@expo/vector-icons';
 import { connect } from 'react-redux';
 import * as ScreenOrientation from 'expo-screen-orientation';
 
-import { getAllVideos } from '../Store/Actions/VideoAction';
+import { getVideos } from '../Store/Actions/VideoAction';
 import VideoCardItem from '../Components/VideoCardItem';
 import ListItemSeparator from '../Components/ListItemSeparator';
 import LoadingComponent from '../Components/LoadingComponent';
@@ -40,37 +41,52 @@ class VideoListScreen extends Component {
         this.state = {
             videoList: [],
             isFlatListRefreshing: false,
-            isOnReady: false
+            isOnReady: false,
+            page: 1,
+            isLoadMoreData: false
         };
     }
 
-    fetchVideoData = async () => {
-        //return this.props.ui_GetAllVideos();
-        this.setState({isFlatListRefreshing: true})
-        this.props.ui_GetAllVideos()
-        .then(( videoList ) => {
+    _fetchData = async () => {
+        let videoList = new Array();
+        try{
+            videoList = await this.props.ui_getVideos(true, this.state.page);
+        }catch( error ){
+            console.log("error", error);
+        }
+        return videoList;
+    }
+
+    loadData = async () => {
+        let page = 1;
+        let _data = new Array();
+        await this.setState({ page: page }, async () => {
+            console.log('page', page);
+            _data = await this._fetchData();
+            this.setState({ videoList: _data });
+        });
+    }
+
+    loadMoreData = async () => {
+        let page = (this.state.page + 1);
+        let _data = new Array();
+        await this.setState({ page: page, isLoadMoreData: true }, async () => {
+            console.log('page', page);
+            _data = await this._fetchData();
             this.setState((prevState) => {
                 return {
                     ...prevState,
-                    videoList: videoList,
-                    isFlatListRefreshing: false
+                    // videoList: [...prevState.videoList, ..._data],
+                    videoList: [].concat(prevState.videoList, _data),
+                    isLoadMoreData: false
                 }
             });
-        }, (error) => {
-            //console.log('error', error);
-            throw new Error( error );
-        })
-        .catch((error) => {
-            console.log("error", error);
-        })
-        .finally(() => {
-            this.setState({ isFlatListRefreshing: false });
         });
-    };
+    }
 
     componentDidMount() {
         this.backHandler = BackHandler.addEventListener('hardwareBackPress', this.backOnPressHandler);
-        this.fetchVideoData()
+        this.loadData()
         .finally(() => {
             this.setState({ isOnReady: true });
         });
@@ -95,7 +111,11 @@ class VideoListScreen extends Component {
     componentDidUpdate( prevProps ){ }
 
     flatListRefreshHandler = () => {
-        this.fetchVideoData();
+        this.setState({isFlatListRefreshing: true});
+        this.loadData()
+            .finally(() => {
+                this.setState({isFlatListRefreshing: false});
+            });
     }
 
     listItemClickHandler = (item) => {
@@ -112,63 +132,68 @@ class VideoListScreen extends Component {
         });
     }
 
-    switchToLandscape = async () => {
-        console.log('switchToLandscape');
-        //ScreenOrientation.allow(ScreenOrientation.Orientation.LANDSCAPE);
-        ScreenOrientation.lockAsync(ScreenOrientation.OrientationLock.LANDSCAPE);
+    _listFooterComponent = () => {
+        return (
+            <View style = { styles.footerStyle }>
+                <TouchableOpacity 
+                    activeOpacity = { 0.7 } 
+                    style = { styles.TouchableOpacity_style }
+                    onPress = { this.loadMoreData } 
+                >
+                    <Text style = { styles.TouchableOpacity_Inside_Text }> Load More </Text>
+                    {
+                        ( this.state.isLoadMoreData ) ?
+                            <ActivityIndicator 
+                                animating={true} 
+                                color={colors.white} 
+                                size='small'
+                                style = {{ marginLeft: 6 }}
+                            /> : null      
+                    }
+                </TouchableOpacity> 
+            </View>
+        )
     }
 
-    switchToPortrait = async () => {
-        console.log('switchToPortrait');
-        //ScreenOrientation.allow(ScreenOrientation.Orientation.PORTRAIT);
-        ScreenOrientation.lockAsync(ScreenOrientation.OrientationLock.PORTRAIT);
+    _itemSeparatorComponent = () => {
+        return (<ListItemSeparator />);
     }
 
-    switchToDefaultOrientation = async () => {
-        console.log('switchToDefaultOrientation');
-        ScreenOrientation.unlockAsync();
+    _renderItem = ( renderItemProps ) => {
+        const { item } = renderItemProps;
+        return (
+            <VideoCardItem 
+                item={item} 
+                onPressHandler={() => {this.listItemClickHandler(item)}}
+                viewStyle={styles.listItemView}
+                contentStyle={styles.listItemContent}
+            />
+        );
+    }
+
+    _refreshControl = () => {
+        return (
+            <RefreshControl 
+                refreshing={this.state.isFlatListRefreshing} 
+                onRefresh={this.flatListRefreshHandler} 
+                // enabled={this.state.isOnReady}
+            />
+        );
     }
 
     getViewContent = () => {
         var content = null;
-
-        // if( this.state.videoList && this.state.videoList.length > 0 ){
-        //     content = (
-        //         <FlatList
-        //             data={this.state.videoList}
-        //             extraData={this.state.videoList}
-        //             ItemSeparatorComponent={ListItemSeparator}
-        //             renderItem={ ({item}) => (<VideoCardItem item={item} onPressHandler={() => {this.listItemClickHandler(item)}}/>) }
-        //             keyExtractor={(item, index) => index.toString()}
-        //             refreshControl={
-        //                 <RefreshControl refreshing={this.state.isFlatListRefreshing} onRefresh={this.flatListRefreshHandler} />
-        //             }
-        //         />
-        //     );
-        // }else{
-        //     content = (
-        //         <Card>
-        //             <Card.Content>
-        //                 <Title>There is no Videos at This Moment</Title>
-        //             </Card.Content>
-        //         </Card>
-        //     );
-        // }
-
         content = (
             <FlatList
                 data={this.state.videoList}
                 extraData={this.state.videoList}
-                ItemSeparatorComponent={ListItemSeparator}
-                renderItem={ ({item}) => (<VideoCardItem item={item} onPressHandler={() => {this.listItemClickHandler(item)}}/>) }
+                // ItemSeparatorComponent={this._itemSeparatorComponent}
+                numColumns={numColumns}
+                renderItem={(renderItemProps) => this._renderItem(renderItemProps)}
                 keyExtractor={(item, index) => index.toString()}
-                refreshControl={
-                    <RefreshControl 
-                        refreshing={this.state.isFlatListRefreshing} 
-                        onRefresh={this.flatListRefreshHandler} 
-                        // enabled={this.state.isOnReady}
-                    />
-                }
+                refreshControl={this._refreshControl()}
+                columnWrapperStyle={styles.flatListColumnWrapperStyle}
+                ListFooterComponent={this._listFooterComponent}
             />
         );
 
@@ -186,23 +211,48 @@ class VideoListScreen extends Component {
     }
 
     render() {
-
         const content = this.getViewContent();
-
         return(
             <SafeAreaView style={styles.container}>
                 <View style={styles.contentContainer}>
-
                     {
-                        ( this.state.isOnReady !== true ) && this._renderLoadingScreen( !this.state.isOnReady )
+                        ( this.state.isOnReady !== true ) && 
+                        this._renderLoadingScreen( !this.state.isOnReady )
                     }
-
+                    {
+                        ( this.state.isOnReady === true ) && (
+                            <View>
+                                <TouchableOpacity onPress={() => {
+                                    this.props.navigation.navigate('DrawerNavigatorRoutes', {
+                                        screen: 'PlayerRoutes',
+                                        // initial: true,
+                                        params: {
+                                            screen: 'LiveStreamVideoPlayerScreen',
+                                            // initial: true,
+                                            params: {
+                                                video: {name: 'MBC_Live_Streaming'}
+                                            }
+                                        }
+                                    });
+                                }}>
+                                    <Card>
+                                        <Card.Content>
+                                            <Title>MBC LIVE STREAMING</Title>
+                                            </Card.Content>
+                                                <Card.Cover source={logoImage} />
+                                            <Card.Content>
+                                            <Paragraph>Malawi Broadcasting Coporation, Watch Live</Paragraph>
+                                        </Card.Content>
+                                    </Card>
+                                </TouchableOpacity>
+                            </View>
+                        )
+                    }
                     {
                         ( this.state.isOnReady === true ) && (
                             content
                         )
                     }
-
                 </View>
             </SafeAreaView>
         );
@@ -211,6 +261,10 @@ class VideoListScreen extends Component {
 }
 
 const colors = Colors;
+
+const { width, height } = Dimensions.get('window');
+const numColumns = 3;
+const itemSize = width / numColumns;
 
 const styles = StyleSheet.create({
     container: {
@@ -222,10 +276,44 @@ const styles = StyleSheet.create({
 
     contentContainer: {
         flex: 1,
-        // paddingTop: StatusBar.currentHeight || 0,
+        // paddingTop: Platform.OS === "android" ? StatusBar.currentHeight : 0,
         // paddingTop: Constants.statusBarHeight || StatusBar.currentHeight || 0,
         flexDirection: "column",
+        justifyContent: 'center'
+    },
+
+    listItemContent: {
+        height: itemSize,
+        backgroundColor: colors.BabyPowder
+    },
+
+    listItemView: {
+        flex: (1 / numColumns), 
+        flexDirection: 'column', 
+        margin: 1
+    },
+
+    flatListColumnWrapperStyle: {},
+
+    footerStyle: {
+        padding: 7,
+        alignItems: 'center',
+        justifyContent: 'center'
+    },
+
+    TouchableOpacity_style: {
+        padding: 7,
+        flexDirection: 'row',
         justifyContent: 'center',
+        alignItems: 'center',
+        backgroundColor: colors.red300,
+        borderRadius: 5,
+    },
+
+    TouchableOpacity_Inside_Text: {
+        textAlign: 'center',
+        color: colors.white,
+        fontSize: 18
     }
 });
 
@@ -235,7 +323,7 @@ const mapStateToProps = (state) => {
 
 const mapDispatchToProps = (dispatch) => {
     return {
-        ui_GetAllVideos: () => dispatch(getAllVideos())
+        ui_getVideos: ( is_paginate = true, page = 1, limit = 10 ) => dispatch(getVideos( is_paginate, page, limit ))
     };
 };
 

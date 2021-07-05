@@ -3,7 +3,8 @@ import {
     StyleSheet,
     View,
     Platform,
-    Pressable
+    Pressable,
+    Dimensions
 } from 'react-native';
 import { 
     Colors,
@@ -125,7 +126,7 @@ const YoutubePlayer = ( props ) => {
                 {
                     <ReactNativeYoutubeIframe
                         ref={playerRef}
-                        height={300}
+                        height={width}
                         play={playing}
                         videoId={videoId}
                         onChangeState={onChangeStateHandler}
@@ -155,6 +156,7 @@ const YoutubePlayer = ( props ) => {
 }
 
 const colors = Colors;
+const { width, height } = Dimensions.get('window');
 
 const styles = StyleSheet.create({
     container: {
