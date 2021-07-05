@@ -44,7 +44,7 @@ const DrawerContentComponent = ( props ) => {
                 screen: 'AudioPlayerScreeen',
                 initial: true,
                 params: {
-                    audio: {audio_uri: 'http://154.66.125.13:88/broadwavehigh.mp3?src=1'}
+                    audio: {name: 'Radio_1'}
                 }
             }
         });
@@ -58,7 +58,7 @@ const DrawerContentComponent = ( props ) => {
                 screen: 'AudioPlayerScreeen',
                 initial: true,
                 params: {
-                    audio: {audio_uri: 'http://154.66.125.13:86/broadwavehigh.mp3?src=1'}
+                    audio: {name: 'Radio_2'}
                 }
             }
         });

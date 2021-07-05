@@ -29,7 +29,7 @@ class Video extends Model
     public function getFormattedImageUri(){
         return asset( $this->image_uri );
     }
-    
+
     public function formatVideoUri(){
         if( ($this->video_uri) && ( strcasecmp($this->type, 'youtube') === 0 ) ){
             $url_components = parse_url( $this->video_uri ); 

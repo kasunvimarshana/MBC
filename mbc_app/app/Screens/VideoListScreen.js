@@ -42,7 +42,8 @@ class VideoListScreen extends Component {
             videoList: [],
             isFlatListRefreshing: false,
             isOnReady: false,
-            page: 1
+            page: 1,
+            isLoadMoreData: false
         };
     }
 
@@ -59,22 +60,27 @@ class VideoListScreen extends Component {
     loadData = async () => {
         let page = 1;
         let _data = new Array();
-        this.setState({ page: page }, console.log('page', page));
-        _data = await this._fetchData(true, this.state.page);
-        this.setState({ videoList: _data });
+        await this.setState({ page: page }, async () => {
+            console.log('page', page);
+            _data = await this._fetchData();
+            this.setState({ videoList: _data });
+        });
     }
 
     loadMoreData = async () => {
         let page = (this.state.page + 1);
         let _data = new Array();
-        this.setState({ page: page }, console.log('page', page));
-        _data = await this._fetchData(true, this.state.page);
-        this.setState((prevState) => {
-            return {
-                ...prevState,
-                // videoList: [..._data, ...prevState.videoList],
-                videoList: [].concat(_data, prevState.videoList)
-            }
+        await this.setState({ page: page, isLoadMoreData: true }, async () => {
+            console.log('page', page);
+            _data = await this._fetchData();
+            this.setState((prevState) => {
+                return {
+                    ...prevState,
+                    // videoList: [...prevState.videoList, ..._data],
+                    videoList: [].concat(prevState.videoList, _data),
+                    isLoadMoreData: false
+                }
+            });
         });
     }
 
@@ -126,31 +132,68 @@ class VideoListScreen extends Component {
         });
     }
 
+    _listFooterComponent = () => {
+        return (
+            <View style = { styles.footerStyle }>
+                <TouchableOpacity 
+                    activeOpacity = { 0.7 } 
+                    style = { styles.TouchableOpacity_style }
+                    onPress = { this.loadMoreData } 
+                >
+                    <Text style = { styles.TouchableOpacity_Inside_Text }> Load More </Text>
+                    {
+                        ( this.state.isLoadMoreData ) ?
+                            <ActivityIndicator 
+                                animating={true} 
+                                color={colors.white} 
+                                size='small'
+                                style = {{ marginLeft: 6 }}
+                            /> : null      
+                    }
+                </TouchableOpacity> 
+            </View>
+        )
+    }
+
+    _itemSeparatorComponent = () => {
+        return (<ListItemSeparator />);
+    }
+
+    _renderItem = ( renderItemProps ) => {
+        const { item } = renderItemProps;
+        return (
+            <VideoCardItem 
+                item={item} 
+                onPressHandler={() => {this.listItemClickHandler(item)}}
+                viewStyle={styles.listItemView}
+                contentStyle={styles.listItemContent}
+            />
+        );
+    }
+
+    _refreshControl = () => {
+        return (
+            <RefreshControl 
+                refreshing={this.state.isFlatListRefreshing} 
+                onRefresh={this.flatListRefreshHandler} 
+                // enabled={this.state.isOnReady}
+            />
+        );
+    }
+
     getViewContent = () => {
         var content = null;
         content = (
             <FlatList
                 data={this.state.videoList}
                 extraData={this.state.videoList}
-                // ItemSeparatorComponent={ListItemSeparator}
+                // ItemSeparatorComponent={this._itemSeparatorComponent}
                 numColumns={numColumns}
-                renderItem={ ({item}) => (
-                    <VideoCardItem 
-                        item={item} 
-                        onPressHandler={() => {this.listItemClickHandler(item)}}
-                        viewStyle={styles.listItemView}
-                        contentStyle={styles.listItemContent}
-                    />
-                ) }
+                renderItem={(renderItemProps) => this._renderItem(renderItemProps)}
                 keyExtractor={(item, index) => index.toString()}
-                refreshControl={
-                    <RefreshControl 
-                        refreshing={this.state.isFlatListRefreshing} 
-                        onRefresh={this.flatListRefreshHandler} 
-                        // enabled={this.state.isOnReady}
-                    />
-                }
+                refreshControl={this._refreshControl()}
                 columnWrapperStyle={styles.flatListColumnWrapperStyle}
+                ListFooterComponent={this._listFooterComponent}
             />
         );
 
@@ -173,12 +216,25 @@ class VideoListScreen extends Component {
             <SafeAreaView style={styles.container}>
                 <View style={styles.contentContainer}>
                     {
-                        ( this.state.isOnReady !== true ) && this._renderLoadingScreen( !this.state.isOnReady )
+                        ( this.state.isOnReady !== true ) && 
+                        this._renderLoadingScreen( !this.state.isOnReady )
                     }
                     {
                         ( this.state.isOnReady === true ) && (
                             <View>
-                                <TouchableOpacity onPress={() => console.log("onPress")}>
+                                <TouchableOpacity onPress={() => {
+                                    this.props.navigation.navigate('DrawerNavigatorRoutes', {
+                                        screen: 'PlayerRoutes',
+                                        // initial: true,
+                                        params: {
+                                            screen: 'LiveStreamVideoPlayerScreen',
+                                            // initial: true,
+                                            params: {
+                                                video: {name: 'MBC_Live_Streaming'}
+                                            }
+                                        }
+                                    });
+                                }}>
                                     <Card>
                                         <Card.Content>
                                             <Title>MBC LIVE STREAMING</Title>
@@ -237,7 +293,28 @@ const styles = StyleSheet.create({
         margin: 1
     },
 
-    flatListColumnWrapperStyle: {}
+    flatListColumnWrapperStyle: {},
+
+    footerStyle: {
+        padding: 7,
+        alignItems: 'center',
+        justifyContent: 'center'
+    },
+
+    TouchableOpacity_style: {
+        padding: 7,
+        flexDirection: 'row',
+        justifyContent: 'center',
+        alignItems: 'center',
+        backgroundColor: colors.red300,
+        borderRadius: 5,
+    },
+
+    TouchableOpacity_Inside_Text: {
+        textAlign: 'center',
+        color: colors.white,
+        fontSize: 18
+    }
 });
 
 const mapStateToProps = (state) => {

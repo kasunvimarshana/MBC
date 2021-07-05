@@ -2,23 +2,10 @@ import React, { Component } from 'react';
 import { 
     StyleSheet,
     View,
-    SafeAreaView,
-    TouchableOpacity,
-    Dimensions,
-    ScrollView,
-    Platform,
-    StatusBar
+    SafeAreaView
 } from 'react-native';
 import { 
-    Colors,
-    Text,
-    Avatar, 
-    Button, 
-    Card, 
-    Title, 
-    Paragraph,
-    Headline,
-    ActivityIndicator 
+    Colors
 } from 'react-native-paper';
 import { FontAwesome, Ionicons } from '@expo/vector-icons';
 import { connect } from 'react-redux';
@@ -27,8 +14,6 @@ import VideoPlayer from 'expo-video-player';
 import * as ScreenOrientation from 'expo-screen-orientation';
 import { activateKeepAwake, deactivateKeepAwake } from 'expo-keep-awake';
 import YoutubePlayer from '../Components/YoutubePlayer';
-
-const logoImage = require('../Assets/logo-removebg.png');
 
 class VideoPlayerScreen extends Component {
 

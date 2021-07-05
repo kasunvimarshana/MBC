@@ -14,8 +14,9 @@ import { connect } from 'react-redux';
 import { Audio } from 'expo-av';
 import * as ScreenOrientation from 'expo-screen-orientation';
 import { activateKeepAwake, deactivateKeepAwake } from 'expo-keep-awake';
-import LoadingComponent from '../Components/LoadingComponent';
 
+import { getLiveStreams } from '../Store/Actions/LiveStreamAction';
+import LoadingComponent from '../Components/LoadingComponent';
 const logoImage = require('../Assets/logo-removebg.png');
 
 class AudioPlayerScreeen extends Component {
@@ -27,10 +28,30 @@ class AudioPlayerScreeen extends Component {
         this.state = {
             isPortrait: true,
             sound: null,
-            playbackStatus: {}
+            playbackStatus: {},
+            audio: null,
+            isOnReady: false,
         };
 
         this.audioPlayerRef = React.createRef();
+    }
+
+    _fetchData = async () => {
+        let _data = null;
+        const { audio } = this.props.route.params;
+        try{
+            _data = await this.props.ui_getLiveStreams( audio.name );
+        }catch( error ){
+            console.log("error", error);
+        }
+        return _data;
+    }
+
+    loadData = async () => {
+        let audio = null;
+        audio = await this._fetchData();
+        audio = audio.filter(x => typeof x!== undefined).shift();
+        this.setState({ audio: audio }, console.log('audio', audio));
     }
 
     _handleAudioPlayerRef = (component) => {
@@ -38,8 +59,9 @@ class AudioPlayerScreeen extends Component {
     }
 
     getSelectedAudio = () => {
-        const { audio } = this.props.route.params;
-        audio.uri = {uri: audio.audio_uri};
+        const { audio } = this.state;
+        audio.audio_uri = audio.uri;
+        audio.uri = {uri: audio.uri};
         return audio;
     }
 
@@ -53,7 +75,14 @@ class AudioPlayerScreeen extends Component {
     componentDidMount() {
         this._isMounted = true;
         this._activate();
-        this._initPlayer();
+        
+        this.loadData()
+        .then(() => {
+            this._initPlayer();
+        })
+        .finally(() => {
+            this.setState({ isOnReady: true });
+        });
     }
 
     componentWillUnmount() {
@@ -72,7 +101,7 @@ class AudioPlayerScreeen extends Component {
     _initPlayer = async () => {
         try {
             const audio = this.getSelectedAudio();
-            //console.log('audio', audio);
+            // console.log('audio', audio);
             await this._createSoundObject(audio);
         } catch (error) {
             console.log("error", error);
@@ -266,11 +295,18 @@ class AudioPlayerScreeen extends Component {
             <SafeAreaView style={styles.container}>
                 <View style={styles.contentContainer}>
                     {
-                        ( this.state.playbackStatus.isLoaded !== true ) && this._renderLoadingScreen( !this.state.playbackStatus.isLoaded )
+                        ( 
+                            ( this.state.isOnReady !== true ) ||
+                            ( this.state.playbackStatus.isLoaded !== true )
+                        ) && 
+                        this._renderLoadingScreen( ( !this.state.isOnReady || !this.state.playbackStatus.isLoaded ) )
                     }
 
                     {
-                        ( this.state.playbackStatus.isLoaded === true ) && (
+                        ( 
+                            ( this.state.isOnReady === true ) && 
+                            ( this.state.playbackStatus.isLoaded === true ) 
+                        ) && (
                             <React.Fragment>
                                 <View style={{ alignItems: "center" }}>
                                     <View style={styles.coverContainer}>
@@ -390,7 +426,9 @@ const mapStateToProps = (state) => {
 };
 
 const mapDispatchToProps = (dispatch) => {
-    return {};
+    return {
+        ui_getLiveStreams: ( name = null ) => dispatch(getLiveStreams( name ))
+    };
 };
 
 export default connect(mapStateToProps, mapDispatchToProps)(AudioPlayerScreeen);

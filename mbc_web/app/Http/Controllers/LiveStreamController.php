@@ -31,12 +31,13 @@ class LiveStreamController extends Controller
     /**
      * Show the form for creating a new resource.
      *
+     * @param  \Illuminate\Http\Request  $request
      * @return \Illuminate\Http\Response
      */
-    public function create()
+    public function create(Request $request)
     {
         //
-        $liveStreams = LiveStream::all();
+        $liveStreams = $this->getLiveStreams( $request );
         $data = [
             'liveStreams' => $liveStreams
         ];
@@ -114,7 +115,11 @@ class LiveStreamController extends Controller
         $validator = Validator::make($request->all(), $rules);
 
         if($validator->fails()){
-            // return redirect()->back()->with('error', 'Error');
+            return redirect()
+                ->back()
+                //->withErrors( $validator )
+                ->with('error', 'Plese check your Inputs')
+                ->withInput();
         }else{
             // $inputData = collect( $request->except(['_token']) );
             $inputData = collect( $request->only(['MBC_Live_Streaming', 'Radio_1', 'Radio_2']) );
@@ -123,9 +128,9 @@ class LiveStreamController extends Controller
                 // $title = (Str::title(Str::of( $key )->replace('_', ' ')));
                 $title = (Str::upper(Str::of( $key )->replace('_', ' ')));
                 $data = [
-                    'name' => $key,
-                    'title' => $title,
-                    'uri' => $item
+                    'name' => trim( $key ),
+                    'title' => trim( $title ),
+                    'uri' => trim( $item )
                 ];
 
                 $liveStream = LiveStream::updateOrCreate(
@@ -136,5 +141,48 @@ class LiveStreamController extends Controller
 
             return redirect()->back()->with('success', 'Success');
         }
+    }
+
+    public function getAllJson(Request $request)
+    {
+        $liveStreams = $this->getLiveStreams( $request );
+        $formatted_liveStreams = $liveStreams->map(function( $liveStream ){
+            return $liveStream;
+        });
+
+        $data = [
+            'liveStreams' => $formatted_liveStreams
+        ];
+
+        return response()->json( $data );
+    }
+
+    private function getLiveStreams(Request $request){
+        $offset = 0;
+        $limit = 10; //$limit = PHP_INT_MAX;
+        $page = 0;
+        $liveStreams = LiveStream::orderBy('id', 'asc');
+
+        if( $request->has('name') && $request->filled('name') ){
+            $name = trim( $request->input('name') );
+            $liveStreams = $liveStreams->where('name', '=', $name);
+        }
+
+        if( $request->has('is_paginate') && $request->filled('is_paginate') && $this->is_true($request->input('is_paginate')) ){
+            if( $request->has('limit') && $request->filled('limit') ){
+                $limit = abs(intval( $request->input('limit') ));
+            }
+            if( $request->has('offset') && $request->filled('offset') ){
+                $offset = abs(intval( $request->input('offset') ));
+            }
+            if( $request->has('page') && $request->filled('page') ){
+                $page = abs(intval( $request->input('page') ));
+                $offset = abs(($page - 1) * $limit);
+            }
+
+            $liveStreams = $liveStreams->skip( $offset )->take( $limit );
+        }
+        $liveStreams = $liveStreams->get();
+        return $liveStreams;
     }
 }

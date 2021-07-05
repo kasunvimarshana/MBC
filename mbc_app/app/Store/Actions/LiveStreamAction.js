@@ -6,47 +6,7 @@ import {
     getOrigin 
 } from '../../Helpers/HTTPHelper';
 
-
-// export const getAllVideos = () => {
-//     return (dispatch, getState) => {
-//         let _responseArray = new Array();
-//         const promise = new Promise((resolve, reject) => {
-//             fetch( REMOTE_API_URI , {
-//                 method: 'GET'
-//             })
-//             .then(async (response) => {
-//                 if( response.status !== 200 ){
-//                     throw new Error( response.status );
-//                 }
-//                 let responseData = await response.json();
-//                 return Object.assign(responseData, {});
-//             },
-//             (error) => {
-//                 //console.log('error', error);
-//                 throw new Error( error );
-//             })
-//             .then((json) => {
-//                 //console.log(json);
-//                 if( json && Object.keys(json).length > 0 ){
-//                     Object.entries(json.videos).forEach(([key, value]) => {
-//                         //console.log(key , value);
-//                         //value.key = key;
-//                         _responseArray.push( value );
-//                     });
-//                 }
-//                 //console.log(_responseArray);
-//                 resolve(_responseArray);
-//             })
-//             .catch((error) => {
-//                 console.log("catch", error);
-//                 reject(error);
-//             });
-//         });
-//         return promise;
-//     };
-// };
-
-export const getVideos = ( is_paginate = true, page = 1, limit = 10 ) => { 
+export const getLiveStreams = ( name = null ) => { 
     return (dispatch, getState) => {
         let _responseArray = new Array();
         const promise = new Promise((resolve, reject) => {
@@ -64,9 +24,7 @@ export const getVideos = ( is_paginate = true, page = 1, limit = 10 ) => {
             } )
             .then( () => {
                 let queryParameters = {
-                    is_paginate: is_paginate,
-                    page: page,
-                    limit: limit
+                    name: name
                 };
 
                 fetchData = {
@@ -85,7 +43,7 @@ export const getVideos = ( is_paginate = true, page = 1, limit = 10 ) => {
                     Origin: getOrigin( remote_api_origin ),
                 };
 
-                const api_url = buildURLWithQueryString(remote_api_uri + "/videos/all/json", queryParameters);
+                const api_url = buildURLWithQueryString(remote_api_uri + "/live-streams/all/json", queryParameters);
                 console.log("api_url", api_url);
                 return fetch(api_url, fetchData);
             } )
@@ -104,7 +62,7 @@ export const getVideos = ( is_paginate = true, page = 1, limit = 10 ) => {
                 //console.log('json', json);
                 let data = json;
                 if( data && Object.keys(data).length > 0 ){
-                    Object.entries(data.videos).forEach(([key, value]) => {
+                    Object.entries(data.liveStreams).forEach(([key, value]) => {
                         _responseArray.push( value );
                     });
                 }

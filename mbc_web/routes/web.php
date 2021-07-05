@@ -38,7 +38,6 @@ Route::group(['middleware' => ['authMiddleware']], function(){
     Route::get('/logout', [App\Http\Controllers\AuthController::class, 'logout'])->name('login.logout');
 });
 
-Route::get('/videos/all/json', [App\Http\Controllers\VideoController::class, 'getAllJson'])->name('video.getAllJson');
 Route::get('/login', [App\Http\Controllers\AuthController::class, 'create'])->name('login.create');
 Route::post('/login', [App\Http\Controllers\AuthController::class, 'login'])->name('login.login');
 

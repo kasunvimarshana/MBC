@@ -18,6 +18,7 @@ import DrawerContentComponent from '../Components/DrawerContentComponent';
 import VideoListScreen from '../Screens/VideoListScreen';
 import VideoPlayerScreen from '../Screens/VideoPlayerScreen';
 import AudioPlayerScreeen from '../Screens/AudioPlayerScreeen';
+import LiveStreamVideoPlayerScreen from '../Screens/LiveStreamVideoPlayerScreen';
 
 const Stack = createStackNavigator();
 const Drawer = createDrawerNavigator();
@@ -79,6 +80,12 @@ const playerRoutes = (props) => {
         return (<AudioPlayerScreeen {..._props}/>);
     }
 
+    // liveStreamVideoPlayerScreen
+    const _liveStreamVideoPlayerScreen = ( _props = {} ) => {
+        //_props = Object.assign({}, _props);
+        return (<LiveStreamVideoPlayerScreen {..._props}/>)
+    }
+
     return (
         <Stack.Navigator 
             initialRouteName="VideoPlayerScreen"
@@ -113,6 +120,22 @@ const playerRoutes = (props) => {
             <Stack.Screen
                 name="AudioPlayerScreeen"
                 component={_audioPlayerScreen}
+                options={(optionProps) => {
+                    const { navigation } = optionProps;
+                    return ({
+                        headerShown: false,
+                        title: null
+                    })
+                }}
+                // listeners={(listenerProps) => {
+                //     const { navigation, route } = listenerProps;
+                //     return ({});
+                // }}
+            />
+
+            <Stack.Screen
+                name="LiveStreamVideoPlayerScreen"
+                component={_liveStreamVideoPlayerScreen}
                 options={(optionProps) => {
                     const { navigation } = optionProps;
                     return ({
