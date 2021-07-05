@@ -47,8 +47,8 @@ Route::post('/login', [App\Http\Controllers\AuthController::class, 'login'])->na
 
 Route::get('/', [App\Http\Controllers\VideoController::class, 'home'])->name('home');
 
-/*Route::get('/app/setup', function(){
-    Artisan::call('storage:link');
-    Artisan::call('migrate:fresh --seed');
-    echo "Setup!!!";
-});*/
+// Route::get('/app/setup', function(){
+//     Artisan::call('storage:link');
+//     Artisan::call('migrate:fresh --seed');
+//     echo "Setup!!!";
+// });
