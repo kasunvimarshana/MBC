@@ -50,5 +50,6 @@ Route::get('/', [App\Http\Controllers\VideoController::class, 'home'])->name('ho
 // Route::get('/app/setup', function(){
 //     Artisan::call('storage:link');
 //     Artisan::call('migrate:fresh --seed');
+//     Artisan::call('db:seed');
 //     echo "Setup!!!";
 // });
