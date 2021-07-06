@@ -36,6 +36,7 @@ const logoImage = require('../Assets/logo-removebg.png');
 class VideoListScreen extends Component {
 
     state = {};
+    _isMounted = false;
 
     constructor( props ) {
         super( props );
@@ -86,6 +87,7 @@ class VideoListScreen extends Component {
     }
 
     componentDidMount() {
+        this._isMounted = true;
         this.backHandler = BackHandler.addEventListener('hardwareBackPress', this.backOnPressHandler);
         this.loadData()
         .finally(() => {
@@ -101,12 +103,9 @@ class VideoListScreen extends Component {
             return;
         };
         //BackHandler.removeEventListener('hardwareBackPress', this.backOnPressHandler);
-        this.backHandler.remove();
-    }
-
-    backOnPressHandler = () => {
-        //this.goBack();
-        return true;
+        if( this.backHandler !== null ){
+            this.backHandler.remove();
+        }
     }
 
     componentDidUpdate( prevProps ){ }
@@ -209,6 +208,11 @@ class VideoListScreen extends Component {
                 size='large'
             />
         );
+    }
+
+    backOnPressHandler = () => {
+        //this.goBack();
+        return true;
     }
 
     render() {

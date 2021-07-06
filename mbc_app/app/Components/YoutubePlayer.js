@@ -35,6 +35,14 @@ const YoutubePlayer = ( props ) => {
         };
     }, [ props ]);
 
+    React.useEffect(() => {
+        //cleanup
+        return () => { 
+            _isMountedRef.current = false; 
+            console.log("cleanup === ", _isMountedRef.current);
+        };
+    }, []);
+
     // const [elapsed, setElapsed] = React.useState(0);
     // React.useEffect(() => {
     //     const interval = setInterval(async () => {

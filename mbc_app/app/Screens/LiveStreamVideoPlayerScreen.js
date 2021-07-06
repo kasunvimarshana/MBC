@@ -1,161 +1,37 @@
-import React, { Component } from 'react';
-import { 
-    StyleSheet,
-    View,
-    SafeAreaView
-} from 'react-native';
-import { 
-    Colors
-} from 'react-native-paper';
-import { FontAwesome, Ionicons } from '@expo/vector-icons';
-import { connect } from 'react-redux';
-import * as ScreenOrientation from 'expo-screen-orientation';
-import { activateKeepAwake, deactivateKeepAwake } from 'expo-keep-awake';
+import React from 'react';
+import { StyleSheet, Text, View, Dimensions } from 'react-native';
+// import { Video } from 'expo';
+import { Video } from 'expo-av';
 
-import { getLiveStreams } from '../Store/Actions/LiveStreamAction';
-import LoadingComponent from '../Components/LoadingComponent';
-import VideoPlayerComponent from '../Components/VideoPlayerComponent';
+export default class LiveStreamVideoPlayerScreen extends React.Component {
+  render() {
 
-class LiveStreamVideoPlayerScreen extends Component {
+    // Set video dimension based on its width, so the video doesn't stretched on any devices.
+    // The video dimension ratio is 11 : 9 for width and height
+    let videoWidth = Dimensions.get('window').width;
+    let videoHeight = videoWidth / 11 * 9 ;
 
-    state = {};
-    _isMounted = false;
+    return (
+      <View style={styles.container}>
+        <Video
+          source={{ uri: 'http://qthttp.apple.com.edgesuite.net/1010qwoeiuryfg/sl.m3u8' }}
+          rate={1.0}
+          volume={1.0}
+          isMuted={true}
+          resizeMode="cover"
+          shouldPlay
+          style={{ width: videoWidth, height: videoHeight }}/>
 
-    constructor( props ) {
-        super( props );
-        this.state = {
-            isPortrait: true,
-            video: null,
-            isOnReady: false,
-        };
-    }
-
-    _fetchData = async () => {
-        let _data = null;
-        const { video } = this.props.route.params;
-        try{
-            _data = await this.props.ui_getLiveStreams( video.name );
-        }catch( error ){
-            console.log("error", error);
-        }
-        return _data;
-    }
-
-    loadData = async () => {
-        let video = null;
-        video = await this._fetchData();
-        video = video.filter(x => typeof x!== undefined).shift();
-        this.setState({ video: video }, console.log('video', video));
-    }
-
-    getSelectedVideo = () => {
-        const { video } = this.state;
-        video.video_uri = video.uri;
-        video.uri = {uri: video.uri};
-        return video;
-    }
-
-    UNSAFE_componentWillMount() {}
-
-    componentDidMount() {
-        this._isMounted = true;
-        this._activate();
-
-        this.loadData()
-        .finally(() => {
-            this.setState({ isOnReady: true });
-        });
-    }
-
-    componentWillUnmount() {
-        this._deactivate();
-    }
-
-    _renderVideoPlayer = ( video ) => {
-        return (
-            <VideoPlayerComponent 
-                videoProps={{
-                    source: video.uri,
-                }}
-                playerProps={{}}
-            />
-        );
-    }
-
-    _renderPlayer = () => {
-        const video = this.getSelectedVideo();
-        //console.log('video', video);
-        return this._renderVideoPlayer(video);
-    }
-
-    _activate = () => {
-        activateKeepAwake(); 
-    };
-
-    _deactivate = () => {
-        deactivateKeepAwake(); 
-    };
-
-    _renderLoadingScreen = ( isAnimating = true ) => {
-        return (
-            <LoadingComponent 
-                animating={isAnimating} 
-                color={colors.red800} 
-                size='large'
-            />
-        );
-    }
-
-    render() {
-        return(
-            <SafeAreaView style={styles.container}>
-                    <View style={styles.contentContainer}>
-                        {
-                            ( this.state.isOnReady !== true ) && 
-                            this._renderLoadingScreen( !this.state.isOnReady )
-                        }
-
-                        {
-                            ( this.state.isOnReady === true ) && 
-                            this._renderPlayer()
-                        }
-                    </View>
-            </SafeAreaView>
-        );
-    }
+        {/* Replace this with comment section like Youtube */}
+        <Text>width * height = {videoWidth} * {videoHeight}</Text>
+      </View>
+    );
+  }
 }
 
-const colors = Colors;
-
 const styles = StyleSheet.create({
-    container: {
-        flex: 1,
-        justifyContent: 'center',
-        alignItems: 'stretch',
-        backgroundColor: "#EAEAEC"
-    },
-
-    contentContainer: {
-        flex: 1,
-        // paddingTop: StatusBar.currentHeight || 0,
-        // paddingTop: Constants.statusBarHeight || StatusBar.currentHeight || 0,
-        // flexDirection: "column",
-        // justifyContent: 'center',
-    },
-
-    player: {
-        flex: 1
-    }
+  container: {
+    flex: 1,
+    backgroundColor: '#fff'
+  },
 });
-
-const mapStateToProps = (state) => {
-    return {};
-};
-
-const mapDispatchToProps = (dispatch) => {
-    return {
-        ui_getLiveStreams: ( name = null ) => dispatch(getLiveStreams( name ))
-    };
-};
-
-export default connect(mapStateToProps, mapDispatchToProps)(LiveStreamVideoPlayerScreen);

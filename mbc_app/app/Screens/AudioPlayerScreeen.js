@@ -4,7 +4,8 @@ import {
     View, 
     Image, 
     SafeAreaView, 
-    TouchableOpacity 
+    TouchableOpacity, 
+    BackHandler 
 } from "react-native";
 import { 
     Colors
@@ -75,7 +76,6 @@ class AudioPlayerScreeen extends Component {
     componentDidMount() {
         this._isMounted = true;
         this._activate();
-        
         this.loadData()
         .then(() => {
             this._initPlayer();
@@ -83,11 +83,22 @@ class AudioPlayerScreeen extends Component {
         .finally(() => {
             this.setState({ isOnReady: true });
         });
+        this.backHandler = BackHandler.addEventListener('hardwareBackPress', this.backOnPressHandler);
     }
 
     componentWillUnmount() {
+        // Clean up listener
+        this._isMounted = false;
+        // fix Warning: Can't perform a React state update on an unmounted component
+        this.setState = (state, callback) => {
+            return;
+        };
         this._unloadSoundObject();
         this._deactivate();
+        //BackHandler.removeEventListener('hardwareBackPress', this.backOnPressHandler);
+        if( this.backHandler !== null ){
+            this.backHandler.remove();
+        }
     }
 
     _activate = () => {
@@ -288,6 +299,11 @@ class AudioPlayerScreeen extends Component {
                 size='large'
             />
         );
+    }
+
+    backOnPressHandler = () => {
+        //this.goBack();
+        // return true;
     }
 
     render() {

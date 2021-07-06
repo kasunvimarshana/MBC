@@ -2,7 +2,8 @@ import React, { Component } from 'react';
 import { 
     StyleSheet,
     View,
-    SafeAreaView
+    SafeAreaView, 
+    BackHandler
 } from 'react-native';
 import { 
     Colors
@@ -37,10 +38,21 @@ class VideoPlayerScreen extends Component {
     componentDidMount() {
         this._isMounted = true;
         this._activate();
+        this.backHandler = BackHandler.addEventListener('hardwareBackPress', this.backOnPressHandler);
     }
 
     componentWillUnmount() {
+        // Clean up listener
+        this._isMounted = false;
+        // fix Warning: Can't perform a React state update on an unmounted component
+        this.setState = (state, callback) => {
+            return;
+        };
         this._deactivate();
+        //BackHandler.removeEventListener('hardwareBackPress', this.backOnPressHandler);
+        if( this.backHandler !== null ){
+            this.backHandler.remove();
+        }
     }
 
     _renderVideoPlayer = ( video ) => {
@@ -79,6 +91,11 @@ class VideoPlayerScreen extends Component {
     _deactivate = () => {
         deactivateKeepAwake(); 
     };
+
+    backOnPressHandler = () => {
+        //this.goBack();
+        // return true;
+    }
 
     render() {
         return(

@@ -174,13 +174,13 @@ const DrawerNavigator = ( props ) => {
         >
             <Drawer.Screen
                 name="VideoListRoutes"
-                options={{drawerLabel: "Play List"}}
+                options={{drawerLabel: "Play List", unmountOnBlur: true}}
                 component={videoListRoutes}
             />
 
             <Drawer.Screen
                 name="PlayerRoutes"
-                options={{drawerLabel: "Label"}}
+                options={{drawerLabel: "Label", unmountOnBlur: true}}
                 component={playerRoutes}
             />
       </Drawer.Navigator>
