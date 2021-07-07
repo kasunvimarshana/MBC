@@ -11,12 +11,11 @@ import {
     Text 
 } from 'react-native-paper';
 import ReactNativeYoutubeIframe from "react-native-youtube-iframe";
+import Constants from 'expo-constants';
 import LoadingComponent from '../Components/LoadingComponent';
 
-const YoutubePlayer = ( props ) => {
-
-    const { videoId } = props;
-
+const YoutubePlayerComponent = ( props ) => {
+    const { sourceData, ...playerProps } = props;
     const _isMountedRef = React.useRef(true);
     const [update, setUpdate] = React.useState();
     const forceUpdate = React.useCallback(() => setUpdate({}), []);
@@ -134,9 +133,9 @@ const YoutubePlayer = ( props ) => {
                 {
                     <ReactNativeYoutubeIframe
                         ref={playerRef}
-                        height={width}
+                        height={playerHeight}
                         play={playing}
-                        videoId={videoId}
+                        videoId={sourceData}
                         onChangeState={onChangeStateHandler}
                         webViewProps={{
                             renderToHardwareTextureAndroid: true,
@@ -156,6 +155,7 @@ const YoutubePlayer = ( props ) => {
                         // forceAndroidAutoplay={true}
                         onReady={() => {_onReadyHandler()}}
                         onError={(error) => {console.log("error", error)}}
+                        {...playerProps}
                     />
                 }
             </View>
@@ -166,6 +166,9 @@ const YoutubePlayer = ( props ) => {
 const colors = Colors;
 const { width, height } = Dimensions.get('window');
 
+const playerWidth = width;
+const playerHeight = width;
+
 const styles = StyleSheet.create({
     container: {
         flex: 1,
@@ -175,5 +178,5 @@ const styles = StyleSheet.create({
     }
 });
 
-export default YoutubePlayer;
+export default YoutubePlayerComponent;
 

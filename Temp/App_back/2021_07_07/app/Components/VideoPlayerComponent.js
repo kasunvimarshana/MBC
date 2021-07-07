@@ -14,7 +14,6 @@ import LoadingComponent from '../Components/LoadingComponent';
 const logoImage = require('../Assets/logo-removebg.png');
 
 const VideoPlayerComponent = ( props ) => {
-    const { sourceData, ...playerProps } = props;
     const _isMountedRef = React.useRef(true);
     const [update, setUpdate] = React.useState();
     const forceUpdate = React.useCallback(() => setUpdate({}), []);
@@ -104,7 +103,7 @@ const VideoPlayerComponent = ( props ) => {
         <React.Fragment>
             <VideoPlayer
                 ref = {(component) => {_handleVideoPlayerRef(component)}}
-                source = {sourceData}
+                // source = {videoSource}
                 resizeMode = {VideoPlayer.RESIZE_MODE_CONTAIN}
                 useNativeControls = {true}
                 style = {styles.videoPlayer}
@@ -122,7 +121,7 @@ const VideoPlayerComponent = ( props ) => {
                 onLoadStart = {() => console.log("onLoadStart")}
                 onLoad = {() => console.log("onLoad")}
                 onError = {(error) => { _errorCallbackHandler(error) }}
-                {...playerProps}
+                {...props.playerProps}
             />
         </React.Fragment>
     );
@@ -137,6 +136,9 @@ const playerHeight = width;
 const styles = StyleSheet.create({
     videoPlayer: {
         flex: 1,
+        alignSelf: 'center',
+        // width: playerWidth, 
+        // height: playerHeight,
         backgroundColor: colors.black
     },
 

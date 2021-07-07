@@ -31,7 +31,6 @@ import { getLiveStreams } from '../Store/Actions/LiveStreamAction';
 import VideoCardItem from '../Components/VideoCardItem';
 import ListItemSeparator from '../Components/ListItemSeparator';
 import LoadingComponent from '../Components/LoadingComponent';
-import VideoPlayerComponent from '../Components/VideoPlayerComponent';
 const logoImage = require('../Assets/logo-removebg.png');
 
 class VideoListScreen extends Component {
@@ -46,8 +45,7 @@ class VideoListScreen extends Component {
             isFlatListRefreshing: false,
             isOnReady: false,
             page: 1,
-            isLoadMoreData: false,
-            tv_live_streaming_name: 'MBC_Live_Streaming'
+            isLoadMoreData: false
         };
     }
 
@@ -91,12 +89,10 @@ class VideoListScreen extends Component {
     componentDidMount() {
         this._isMounted = true;
         this.backHandler = BackHandler.addEventListener('hardwareBackPress', this.backOnPressHandler);
-        this.screenOrientationSubscription = ScreenOrientation.addOrientationChangeListener( this.screenOrientationHandler );
         this.loadData()
         .finally(() => {
             this.setState({ isOnReady: true });
         });
-        // this.lockScreenToPortraitOrientation();
     }
 
     componentWillUnmount() {
@@ -109,10 +105,6 @@ class VideoListScreen extends Component {
         if( this.backHandler !== null ){
             //BackHandler.removeEventListener('hardwareBackPress', this.backOnPressHandler);
             this.backHandler.remove();
-        }
-        this.unlockScreenToDefault();
-        if( this.screenOrientationSubscription !== null ){
-            ScreenOrientation.removeOrientationChangeListeners( this.screenOrientationSubscription );
         }
     }
 
@@ -223,22 +215,6 @@ class VideoListScreen extends Component {
         return true;
     }
 
-    screenOrientationHandler = () => {
-        console.log("screenOrientationHandler");
-    }
-
-    lockScreenToLandscapeOrientation = async () => {
-        await ScreenOrientation.lockAsync(ScreenOrientation.OrientationLock.LANDSCAPE_LEFT);
-    }
-
-    lockScreenToPortraitOrientation = async () => {
-        await ScreenOrientation.lockAsync(ScreenOrientation.OrientationLock.PORTRAIT);
-    }
-
-    unlockScreenToDefault = async () => {
-        await ScreenOrientation.unlockAsync();
-    }
-
     render() {
         const content = this.getViewContent();
         return(
@@ -259,7 +235,7 @@ class VideoListScreen extends Component {
                                             screen: 'LiveStreamVideoPlayerScreen',
                                             // initial: true,
                                             params: {
-                                                video: {name: this.state.tv_live_streaming_name}
+                                                video: {name: 'MBC_Live_Streaming'}
                                             }
                                         }
                                     });

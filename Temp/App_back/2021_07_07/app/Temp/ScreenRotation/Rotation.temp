@@ -1,0 +1,13 @@
+import {ScreenOrientation} from 'expo';
+
+const [orientationIsLandscape, setOrientationIsLandscape] = useState(false);
+
+<Video
+    onFullscreenUpdate={async () => {
+        await ScreenOrientation.lockAsync(
+            orientationIsLandscape ? ScreenOrientation.OrientationLock.PORTRAIT : 
+            ScreenOrientation.OrientationLock.LANDSCAPE_LEFT,
+        );
+        setOrientationIsLandscape(!orientationIsLandscape);
+    }}>
+</Video>

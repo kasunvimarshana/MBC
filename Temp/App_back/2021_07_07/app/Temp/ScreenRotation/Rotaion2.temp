@@ -1,0 +1,26 @@
+import * as ScreenOrientation from 'expo-screen-orientation';
+
+const videoRef = useRef<any>() // Note: No idea which type i should use here
+
+const onFullscreenUpdate = async ({fullscreenUpdate}: VideoFullscreenUpdateEvent) => {
+    switch (fullscreenUpdate) {
+        case Video.FULLSCREEN_UPDATE_PLAYER_DID_PRESENT:
+            await ScreenOrientation.unlockAsync() // only on Android required
+            break;
+        case Video.FULLSCREEN_UPDATE_PLAYER_WILL_DISMISS:
+            await ScreenOrientation.lockAsync(ScreenOrientation.OrientationLock.PORTRAIT) // only on Android required
+            break;
+    }
+}
+
+const showVideoInFullscreen = async () => { await videoRef.current.presentFullscreenPlayer() }
+
+<Button title="Play video" onPress={showVideoInFullscreen} />
+
+<Video
+    ref={videoRef}
+    source={{uri: videoSource}}
+    resizeMode={ResizeMode.CONTAIN}
+    useNativeControls={true}
+    onFullscreenUpdate={onFullscreenUpdate}
+/>

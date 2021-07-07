@@ -12,10 +12,12 @@ import { FontAwesome, Ionicons } from '@expo/vector-icons';
 import { connect } from 'react-redux';
 import * as ScreenOrientation from 'expo-screen-orientation';
 import { activateKeepAwake, deactivateKeepAwake } from 'expo-keep-awake';
-import YoutubePlayerComponent from '../Components/YoutubePlayerComponent';
+
+import { getLiveStreams } from '../Store/Actions/LiveStreamAction';
+import LoadingComponent from '../Components/LoadingComponent';
 import VideoPlayerComponent from '../Components/VideoPlayerComponent';
 
-class VideoPlayerScreen extends Component {
+class LiveStreamVideoPlayerScreen extends Component {
 
     state = {};
     _isMounted = false;
@@ -23,8 +25,35 @@ class VideoPlayerScreen extends Component {
     constructor( props ) {
         super( props );
         this.state = {
-            isPortrait: true
+            isPortrait: true,
+            video: null,
+            isOnReady: false,
         };
+    }
+
+    _fetchData = async () => {
+        let _data = null;
+        const { video } = this.props.route.params;
+        try{
+            _data = await this.props.ui_getLiveStreams( video.name );
+        }catch( error ){
+            console.log("error", error);
+        }
+        return _data;
+    }
+
+    loadData = async () => {
+        let video = null;
+        video = await this._fetchData();
+        video = video.filter(x => typeof x!== undefined).shift();
+        this.setState({ video: video }, console.log('video', video));
+    }
+
+    getSelectedVideo = () => {
+        const { video } = this.state;
+        video.video_uri = video.uri;
+        video.uri = {uri: video.uri};
+        return video;
     }
 
     UNSAFE_componentWillMount() {}
@@ -32,6 +61,10 @@ class VideoPlayerScreen extends Component {
     componentDidMount() {
         this._isMounted = true;
         this._activate();
+        this.loadData()
+        .finally(() => {
+            this.setState({ isOnReady: true });
+        });
         this.backHandler = BackHandler.addEventListener('hardwareBackPress', this.backOnPressHandler);
     }
 
@@ -48,33 +81,22 @@ class VideoPlayerScreen extends Component {
             this.backHandler.remove();
         }
     }
-    
-    _renderVideoPlayer = ( playerProps ) => {
-        let tempPlayer = (
-            <VideoPlayerComponent {...playerProps}/>
-        );
-        return tempPlayer;
-    };
 
-    _renderYoutubePlayer = ( playerProps ) => {
-        let tempPlayer = (
-            <YoutubePlayerComponent {...playerProps}/>
+    _renderVideoPlayer = ( video ) => {
+        return (
+            <VideoPlayerComponent 
+                videoProps={{
+                    source: video.uri,
+                }}
+                playerProps={{}}
+            />
         );
-        return tempPlayer;
     }
 
     _renderPlayer = () => {
-        let tempPlayer = null;
-        let _playerProps = new Object();
-        const { video, ...etc } = this.props.route.params;
-        if( (video) && ( String(video.type).localeCompare("youtube") === 0) ){
-            _playerProps.sourceData = video.video_uri;
-            tempPlayer = this._renderYoutubePlayer(_playerProps);
-        }else{
-            _playerProps.sourceData = {uri: video.video_uri};
-            tempPlayer = this._renderVideoPlayer(_playerProps);
-        }
-        return tempPlayer;
+        const video = this.getSelectedVideo();
+        //console.log('video', video);
+        return this._renderVideoPlayer(video);
     }
 
     _activate = () => {
@@ -85,6 +107,16 @@ class VideoPlayerScreen extends Component {
         deactivateKeepAwake(); 
     };
 
+    _renderLoadingScreen = ( isAnimating = true ) => {
+        return (
+            <LoadingComponent 
+                animating={isAnimating} 
+                color={colors.red800} 
+                size='large'
+            />
+        );
+    }
+
     backOnPressHandler = () => {
         //this.goBack();
         // return true;
@@ -94,7 +126,15 @@ class VideoPlayerScreen extends Component {
         return(
             <SafeAreaView style={styles.container}>
                     <View style={styles.contentContainer}>
-                        {this._renderPlayer()}
+                        {
+                            ( this.state.isOnReady !== true ) && 
+                            this._renderLoadingScreen( !this.state.isOnReady )
+                        }
+
+                        {
+                            ( this.state.isOnReady === true ) && 
+                            this._renderPlayer()
+                        }
                     </View>
             </SafeAreaView>
         );
@@ -108,14 +148,14 @@ const styles = StyleSheet.create({
         flex: 1,
         justifyContent: 'center',
         alignItems: 'stretch',
-        backgroundColor: '#EAEAEC'
+        backgroundColor: "#EAEAEC"
     },
 
     contentContainer: {
         flex: 1,
         // paddingTop: StatusBar.currentHeight || 0,
         // paddingTop: Constants.statusBarHeight || StatusBar.currentHeight || 0,
-        // flexDirection: 'column',
+        // flexDirection: "column",
         // justifyContent: 'center',
     },
 
@@ -129,7 +169,9 @@ const mapStateToProps = (state) => {
 };
 
 const mapDispatchToProps = (dispatch) => {
-    return {};
+    return {
+        ui_getLiveStreams: ( name = null ) => dispatch(getLiveStreams( name ))
+    };
 };
 
-export default connect(mapStateToProps, mapDispatchToProps)(VideoPlayerScreen);
+export default connect(mapStateToProps, mapDispatchToProps)(LiveStreamVideoPlayerScreen);

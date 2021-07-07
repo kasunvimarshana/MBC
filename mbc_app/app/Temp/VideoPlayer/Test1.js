@@ -8,19 +8,18 @@ import {
     Text 
 } from 'react-native-paper';
 import { FontAwesome, Ionicons } from '@expo/vector-icons';
-import { Video as VideoPlayer, AVPlaybackStatus } from 'expo-av';
-import Constants from 'expo-constants';
+import { Video } from 'expo-av';
+import VideoPlayer from 'expo-video-player';
 import LoadingComponent from '../Components/LoadingComponent';
-const logoImage = require('../Assets/logo-removebg.png');
 
 const VideoPlayerComponent = ( props ) => {
-    const { sourceData, ...playerProps } = props;
+
     const _isMountedRef = React.useRef(true);
     const [update, setUpdate] = React.useState();
     const forceUpdate = React.useCallback(() => setUpdate({}), []);
     const [playbackStatus, setPlaybackStatus] = React.useState({});
     const [isPortrait, setIsPortrait] = React.useState(true);
-    const [isFullscreen, setIsFullsreen] = React.useState(true);
+    const [inFullscreen, setInFullsreen] = React.useState(false)
     const videoPlayerRef = React.useRef();
     
     React.useEffect(() => {
@@ -34,6 +33,14 @@ const VideoPlayerComponent = ( props ) => {
             console.log("cleanup", _isMountedRef.current);
         };
     }, [ props ]);
+
+    React.useEffect(() => {
+        console.log("Mount ==================================");
+        //cleanup
+        return () => { 
+            console.log("Unmount ==================================");
+        };
+    }, []);
 
     const _onPlaybackStatusUpdate = React.useCallback((_playbackStatus) => {
         console.log("_playbackStatus", _playbackStatus);
@@ -88,7 +95,7 @@ const VideoPlayerComponent = ( props ) => {
         console.log('errorCallbackHandler', error);
     }, []);
 
-    const _unloadVideoObject = React.useCallback( async () => {
+    const _unloadSoundObject = React.useCallback( async () => {
         let result = null;
         if( (videoPlayerRef) && (videoPlayerRef.current) ){
             try{
@@ -103,26 +110,55 @@ const VideoPlayerComponent = ( props ) => {
     return (
         <React.Fragment>
             <VideoPlayer
-                ref = {(component) => {_handleVideoPlayerRef(component)}}
-                source = {sourceData}
-                resizeMode = {VideoPlayer.RESIZE_MODE_CONTAIN}
-                useNativeControls = {true}
-                style = {styles.videoPlayer}
-                shouldPlay = {true}
-                // isLooping = {true}
-                // rate = {1.0}
-                // volume = {1.0}
-                // isMuted = {false}
-                usePoster = {true}
-                posterSource = {logoImage}
-                posterStyle = {styles.posterStyle}
-                onPlaybackStatusUpdate = {(onPlaybackStatus) => {_onPlaybackStatusUpdate(onPlaybackStatus)}}
-                onReadyForDisplay = {() => console.log("onReadyForDisplay")}
-                onFullscreenUpdate = {() => console.log("onFullscreenUpdate")}
-                onLoadStart = {() => console.log("onLoadStart")}
-                onLoad = {() => console.log("onLoad")}
-                onError = {(error) => { _errorCallbackHandler(error) }}
-                {...playerProps}
+                videoProps={{
+                    ref: (component) => {_handleVideoPlayerRef(component)},
+                    // onPlaybackStatusUpdate: (onPlaybackStatus) => {_onPlaybackStatusUpdate(onPlaybackStatus)}, 
+                    shouldPlay: false,
+                    resizeMode: Video.RESIZE_MODE_CONTAIN,
+                    // source: videoSource,
+                    // rate: 1.0,
+                    // volume: 1.0,
+                    // isMuted: false,
+                    // isLooping: true,
+                    ...props.videoProps,
+                }}
+                errorCallback={(error) => { _errorCallbackHandler(error) }}
+                playbackCallback={(onPlaybackStatus) => {_onPlaybackStatusUpdate(onPlaybackStatus)}}
+                defaultControlsVisible={false}
+                timeVisible={true}
+                textStyle={{}}
+                slider={{visible: true}}
+                activityIndicator={{}}
+                // animation={{ fadeInDuration: 200, fadeOutDuration: 1000 }}
+                style={{
+                    videoBackground: {}
+                }}
+                // icon={{}}
+                fullscreen={{inFullscreen: true}}
+                //////////////////////////////////////////////////////////////
+                // fullscreen={{
+                //     inFullscreen: inFullscreen2,
+                //     enterFullscreen: async () => {
+                //       setStatusBarHidden(true, 'fade')
+                //       setInFullsreen2(!inFullscreen2)
+                //       await ScreenOrientation.lockAsync(ScreenOrientation.OrientationLock.LANDSCAPE_LEFT)
+                //       refVideo2.current.setStatusAsync({
+                //         shouldPlay: true,
+                //       })
+                //     },
+                //     exitFullscreen: async () => {
+                //       setStatusBarHidden(false, 'fade')
+                //       setInFullsreen2(!inFullscreen2)
+                //       await ScreenOrientation.lockAsync(ScreenOrientation.OrientationLock.DEFAULT)
+                //     },
+                //   }}
+                //   style={{
+                //     videoBackgroundColor: 'black',
+                //     height: inFullscreen2 ? Dimensions.get('window').width : 160,
+                //     width: inFullscreen2 ? Dimensions.get('window').height : 320,
+                //   }}
+                ///////////////////////////////////////////////////////////////
+                {...props.playerProps}
             />
         </React.Fragment>
     );
@@ -131,20 +167,9 @@ const VideoPlayerComponent = ( props ) => {
 const colors = Colors;
 const { width, height } = Dimensions.get('window');
 
-const playerWidth = width;
-const playerHeight = width;
-
 const styles = StyleSheet.create({
-    videoPlayer: {
-        flex: 1,
-        backgroundColor: colors.black
-    },
-
-    posterStyle: {
-        flex: 1, 
-        width: '100%', 
-        height: '100%', 
-        resizeMode: 'contain'
+    player: {
+        flex: 1
     }
 });
 

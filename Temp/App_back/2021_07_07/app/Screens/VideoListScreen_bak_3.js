@@ -27,6 +27,7 @@ import { connect } from 'react-redux';
 import * as ScreenOrientation from 'expo-screen-orientation';
 
 import { getVideos } from '../Store/Actions/VideoAction';
+import { getLiveStreams } from '../Store/Actions/LiveStreamAction';
 import VideoCardItem from '../Components/VideoCardItem';
 import ListItemSeparator from '../Components/ListItemSeparator';
 import LoadingComponent from '../Components/LoadingComponent';
@@ -35,6 +36,7 @@ const logoImage = require('../Assets/logo-removebg.png');
 class VideoListScreen extends Component {
 
     state = {};
+    _isMounted = false;
 
     constructor( props ) {
         super( props );
@@ -85,11 +87,14 @@ class VideoListScreen extends Component {
     }
 
     componentDidMount() {
+        this._isMounted = true;
         this.backHandler = BackHandler.addEventListener('hardwareBackPress', this.backOnPressHandler);
+        this.screenOrientationSubscription = ScreenOrientation.addOrientationChangeListener( this.screenOrientationHandler );
         this.loadData()
         .finally(() => {
             this.setState({ isOnReady: true });
         });
+        // this.lockScreenToPortraitOrientation();
     }
 
     componentWillUnmount() {
@@ -99,13 +104,14 @@ class VideoListScreen extends Component {
         this.setState = (state, callback) => {
             return;
         };
-        //BackHandler.removeEventListener('hardwareBackPress', this.backOnPressHandler);
-        this.backHandler.remove();
-    }
-
-    backOnPressHandler = () => {
-        //this.goBack();
-        return true;
+        if( this.backHandler !== null ){
+            //BackHandler.removeEventListener('hardwareBackPress', this.backOnPressHandler);
+            this.backHandler.remove();
+        }
+        this.unlockScreenToDefault();
+        if( this.screenOrientationSubscription !== null ){
+            ScreenOrientation.removeOrientationChangeListeners( this.screenOrientationSubscription );
+        }
     }
 
     componentDidUpdate( prevProps ){ }
@@ -208,6 +214,27 @@ class VideoListScreen extends Component {
                 size='large'
             />
         );
+    }
+
+    backOnPressHandler = () => {
+        //this.goBack();
+        return true;
+    }
+
+    screenOrientationHandler = () => {
+        console.log("screenOrientationHandler");
+    }
+
+    lockScreenToLandscapeOrientation = async () => {
+        await ScreenOrientation.lockAsync(ScreenOrientation.OrientationLock.LANDSCAPE_LEFT);
+    }
+
+    lockScreenToPortraitOrientation = async () => {
+        await ScreenOrientation.lockAsync(ScreenOrientation.OrientationLock.PORTRAIT);
+    }
+
+    unlockScreenToDefault = async () => {
+        await ScreenOrientation.unlockAsync();
     }
 
     render() {
@@ -323,7 +350,8 @@ const mapStateToProps = (state) => {
 
 const mapDispatchToProps = (dispatch) => {
     return {
-        ui_getVideos: ( is_paginate = true, page = 1, limit = 10 ) => dispatch(getVideos( is_paginate, page, limit ))
+        ui_getVideos: ( is_paginate = true, page = 1, limit = 10 ) => dispatch(getVideos( is_paginate, page, limit )),
+        ui_getLiveStreams: ( name = null ) => dispatch(getLiveStreams( name )) 
     };
 };
 
