@@ -88,7 +88,6 @@ class LiveStreamVideoPlayerScreen extends Component {
         let _playerProps = new Object();
         const { video, ...etc } = this.state;
         if( video !== null ){
-            console.log('video ===', video);
             _playerProps.sourceData = {uri: video.uri};
             tempPlayer = this._renderVideoPlayer(_playerProps);
         }

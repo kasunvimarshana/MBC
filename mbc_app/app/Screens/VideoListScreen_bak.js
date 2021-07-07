@@ -47,8 +47,7 @@ class VideoListScreen extends Component {
             isOnReady: false,
             page: 1,
             isLoadMoreData: false,
-            tv_live_streaming_name: 'MBC_Live_Streaming',
-            tv_live_streaming_video: null,
+            tv_live_streaming_name: 'MBC_Live_Streaming'
         };
     }
 
@@ -93,11 +92,7 @@ class VideoListScreen extends Component {
         this._isMounted = true;
         this.backHandler = BackHandler.addEventListener('hardwareBackPress', this.backOnPressHandler);
         this.screenOrientationSubscription = ScreenOrientation.addOrientationChangeListener( this.screenOrientationHandler );
-        // this.loadData()
-        // .finally(() => {
-        //     this.setState({ isOnReady: true });
-        // });
-        Promise.all([this.loadData(), this.loadLiveVideoData()])
+        this.loadData()
         .finally(() => {
             this.setState({ isOnReady: true });
         });
@@ -244,45 +239,6 @@ class VideoListScreen extends Component {
         await ScreenOrientation.unlockAsync();
     }
 
-    /* *** */
-    loadLiveVideoData = async () => {
-        let video = null;
-        video = await this._fetchLiveVideoData();
-        video = video.filter(x => typeof x!== undefined).shift();
-        this.setState({ tv_live_streaming_video: video }, console.log('video', video));
-    }
-
-    _fetchLiveVideoData = async () => {
-        let _data = null;
-        try{
-            _data = await this.props.ui_getLiveStreams( this.state.tv_live_streaming_name );
-        }catch( error ){
-            console.log("error", error);
-        }
-        return _data;
-    }
-
-    _renderVideoPlayer = ( playerProps ) => {
-        return (
-            <VideoPlayerComponent 
-                {...playerProps}
-            />
-        );
-    }
-
-    _renderPlayer = () => {
-        let tempPlayer = null;
-        let _playerProps = new Object();
-        const { tv_live_streaming_video, ...etc } = this.state;
-        if( tv_live_streaming_video !== null ){
-            _playerProps.sourceData = {uri: tv_live_streaming_video.uri};
-            _playerProps.shouldPlay = false;
-            tempPlayer = this._renderVideoPlayer(_playerProps);
-        }
-        return tempPlayer;
-    }
-    /* *** */
-
     render() {
         const content = this.getViewContent();
         return(
@@ -293,7 +249,7 @@ class VideoListScreen extends Component {
                         this._renderLoadingScreen( !this.state.isOnReady )
                     }
                     {
-                        /*( this.state.isOnReady === true ) && (
+                        ( this.state.isOnReady === true ) && (
                             <View>
                                 <TouchableOpacity onPress={() => {
                                     this.props.navigation.navigate('DrawerNavigatorRoutes', {
@@ -310,7 +266,7 @@ class VideoListScreen extends Component {
                                 }}>
                                     <Card>
                                         <Card.Content>
-                                            <Title>MBC TV LIVE STREAMING</Title>
+                                            <Title>MBC LIVE STREAMING</Title>
                                             </Card.Content>
                                                 <Card.Cover source={logoImage} />
                                             <Card.Content>
@@ -319,27 +275,8 @@ class VideoListScreen extends Component {
                                     </Card>
                                 </TouchableOpacity>
                             </View>
-                        )*/
-                    }
-
-                    {
-                        ( this.state.isOnReady === true ) && (
-                            <View>
-                                <Card>
-                                    <Card.Content>
-                                        <Title>MBC TV LIVE STREAMING</Title>
-                                    </Card.Content>
-                                    <Card.Content style={{ height: (height / 3)}}>
-                                        { this._renderPlayer() }
-                                    </Card.Content>
-                                    <Card.Content>
-                                        <Paragraph>Malawi Broadcasting Coporation, Watch Live</Paragraph>
-                                    </Card.Content>
-                                </Card>
-                            </View>
                         )
                     }
-
                     {
                         ( this.state.isOnReady === true ) && (
                             content
