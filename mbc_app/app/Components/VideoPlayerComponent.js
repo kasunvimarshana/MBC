@@ -23,6 +23,7 @@ const VideoPlayerComponent = ( props ) => {
     const [isFullscreen, setIsFullsreen] = React.useState(true);
     const [videoSourceData, setVideoSourceData] = React.useState( sourceData );
     const [isPlaying, setIsPlaying] = React.useState(shouldPlay);
+    const [isShowLoadingComponent, setShowLoadingComponent] = React.useState(false);
     const videoPlayerRef = React.useRef();
     
     React.useEffect(() => {
@@ -63,6 +64,7 @@ const VideoPlayerComponent = ( props ) => {
         if( _isMountedRef.current === true ){
             setPlaybackStatus(_playbackStatus);
             if( _playbackStatus.isLoaded ){
+                setShowLoadingComponent(false, console.log("setShowLoadingComponent", false));
                 // setIsPlaying( _playbackStatus.isPlaying, console.error("setIsPlaying", _playbackStatus.isPlaying) );
             }
         }
@@ -107,6 +109,7 @@ const VideoPlayerComponent = ( props ) => {
         //console.error('Error: ', error.message, error.type, error.obj);
         console.log('errorCallbackHandler', error);
         // _loadVideoObject
+        setShowLoadingComponent(true, console.log("setShowLoadingComponent", true));
         _loadVideoObject( true );
     }, []);
 
@@ -178,7 +181,7 @@ const VideoPlayerComponent = ( props ) => {
                 onError = {(error) => { _errorCallbackHandler(error) }}
                 {...playerProps}
             />
-            { ( playbackStatus.isLoaded !== true ) && (_renderLoadingScreen( !playbackStatus.isLoaded )) }
+            { ( isShowLoadingComponent === true ) && (_renderLoadingScreen( isShowLoadingComponent )) }
         </React.Fragment>
     );
 }
