@@ -49,6 +49,7 @@ class VideoListScreen extends Component {
             isLoadMoreData: false,
             tv_live_streaming_name: 'MBC_Live_Streaming',
             tv_live_streaming_video: null,
+            player: null
         };
     }
 
@@ -97,7 +98,7 @@ class VideoListScreen extends Component {
         // .finally(() => {
         //     this.setState({ isOnReady: true });
         // });
-        Promise.all([this.loadData(), this.loadLiveVideoData()])
+        Promise.all([this.loadData(), this._renderPlayer()])
         .finally(() => {
             this.setState({ isOnReady: true });
         });
@@ -270,17 +271,38 @@ class VideoListScreen extends Component {
         );
     }
 
-    _renderPlayer = () => {
+    _setPlayer = () => {
         let tempPlayer = null;
         let _playerProps = new Object();
         const { tv_live_streaming_video, ...etc } = this.state;
         if( tv_live_streaming_video !== null ){
             _playerProps.sourceData = {uri: tv_live_streaming_video.uri};
-            _playerProps.shouldPlay = false;
+            // _playerProps.shouldPlay = false;
+            // _playerProps.onError = this._playeronErrorHandler;
             tempPlayer = this._renderVideoPlayer(_playerProps);
         }
+        this.setState({ player: tempPlayer }, console.log("setState: player"));
         return tempPlayer;
     }
+
+    _renderPlayer = async () => {
+        await this.loadLiveVideoData();
+        await this._setPlayer();
+        return true;
+    }
+
+    _playeronErrorHandler = async ( error ) => {
+        console.log("error", error);
+    }
+
+    _reload = () => {
+        console.log("_reload");
+        this.reRender();
+    }
+
+    reRender = () => {
+        this.forceUpdate();
+    };
     /* *** */
 
     render() {
@@ -330,7 +352,7 @@ class VideoListScreen extends Component {
                                         <Title>MBC TV LIVE STREAMING</Title>
                                     </Card.Content>
                                     <Card.Content style={{ height: (height / 3)}}>
-                                        { this._renderPlayer() }
+                                        { this.state.player }
                                     </Card.Content>
                                     <Card.Content>
                                         <Paragraph>Malawi Broadcasting Coporation, Watch Live</Paragraph>

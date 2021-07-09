@@ -28,6 +28,7 @@ class LiveStreamVideoPlayerScreen extends Component {
             isPortrait: true,
             video: null,
             isOnReady: false,
+            player: null
         };
     }
 
@@ -54,10 +55,18 @@ class LiveStreamVideoPlayerScreen extends Component {
     componentDidMount() {
         this._isMounted = true;
         this._activate();
-        this.loadData()
+        // this.loadData()
+        // .then(() => {
+        //     this._setPlayer();
+        // })
+        // .finally(() => {
+        //     this.setState({ isOnReady: true });
+        // });
+        this._renderPlayer()
         .finally(() => {
             this.setState({ isOnReady: true });
         });
+
         this.backHandler = BackHandler.addEventListener('hardwareBackPress', this.backOnPressHandler);
     }
 
@@ -83,15 +92,23 @@ class LiveStreamVideoPlayerScreen extends Component {
         );
     }
 
-    _renderPlayer = () => {
+    _setPlayer = async () => {
         let tempPlayer = null;
         let _playerProps = new Object();
         const { video, ...etc } = this.state;
         if( video !== null ){
             _playerProps.sourceData = {uri: video.uri};
+            // _playerProps.shouldPlay = true;
+            _playerProps.onError = this._playeronErrorHandler;
             tempPlayer = this._renderVideoPlayer(_playerProps);
         }
-        return tempPlayer;
+        this.setState({ player: tempPlayer }, console.log("setState: player"));
+    }
+
+    _renderPlayer = async () => {
+        await this.loadData();
+        await this._setPlayer();
+        return true;
     }
 
     _activate = () => {
@@ -117,6 +134,20 @@ class LiveStreamVideoPlayerScreen extends Component {
         // return true;
     }
 
+    _playeronErrorHandler = ( error ) => {
+        console.log("error", error);
+        this._reload();
+    }
+
+    _reload = () => {
+        console.log("_reload");
+        this.reRender();
+    }
+
+    reRender = () => {
+        this.forceUpdate();
+    };
+
     render() {
         return(
             <SafeAreaView style={styles.container}>
@@ -128,7 +159,7 @@ class LiveStreamVideoPlayerScreen extends Component {
 
                         {
                             ( this.state.isOnReady === true ) && 
-                            this._renderPlayer()
+                            ( this.state.player )
                         }
                     </View>
             </SafeAreaView>
