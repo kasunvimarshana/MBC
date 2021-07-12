@@ -50,16 +50,16 @@ Route::group(['middleware' => ['permitCountries']], function(){
 
 Route::get('/deny', [App\Http\Controllers\HomeController::class, 'home_deny'])->name('home.deny');
 
-Route::group(['middleware' => ['authMiddleware']], function(){
-    Route::get('/app/setup', function(){
-        // Artisan::call('storage:link');
-        // echo "storage:link <br />";
-        // Artisan::call('migrate:fresh --seed');
-        // echo "migrate:fresh --seed <br />";
-        Artisan::call('migrate --seed');
-        echo "migrate --seed <br />";
-        // Artisan::call('db:seed');
-        // echo "db:seed <br />";
-        echo "Setup!!! <br />";
-    });
-});
+// Route::group(['middleware' => ['authMiddleware']], function(){
+//     Route::get('/app/setup', function(){
+//         // Artisan::call('storage:link');
+//         // echo "storage:link <br />";
+//         // Artisan::call('migrate:fresh --seed');
+//         // echo "migrate:fresh --seed <br />";
+//         // Artisan::call('migrate --seed');
+//         // echo "migrate --seed <br />";
+//         // Artisan::call('db:seed');
+//         // echo "db:seed <br />";
+//         echo "Setup!!! <br />";
+//     });
+// });
