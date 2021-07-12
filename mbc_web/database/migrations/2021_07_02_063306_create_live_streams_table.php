@@ -17,7 +17,7 @@ class CreateLiveStreamsTable extends Migration
             $table->id();
             $table->timestamps();
 
-            $table->string('name');
+            $table->string('name')->unique();
             $table->string('title')->nullable();
             $table->string('uri')->nullable();
             // $table->string('type')->nullable(); //enum('COLUMN', ['audio', 'video']);

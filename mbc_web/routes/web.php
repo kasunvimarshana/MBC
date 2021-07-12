@@ -31,9 +31,8 @@ Route::group(['middleware' => ['authMiddleware']], function(){
     Route::get('/live-streams/create', [App\Http\Controllers\LiveStreamController::class, 'create'])->name('liveStream.create');
     Route::post('/live-streams/store', [App\Http\Controllers\LiveStreamController::class, 'createOrUpdate'])->name('liveStream.store');
 
-    Route::get('/linkstorage', function(){
-        Artisan::call('storage:link');
-    });
+    Route::get('/app-settings/create', [App\Http\Controllers\AppSettingController::class, 'create'])->name('appSetting.create');
+    Route::post('/app-settings/store', [App\Http\Controllers\AppSettingController::class, 'createOrUpdate'])->name('appSetting.store');
 
     Route::get('/logout', [App\Http\Controllers\AuthController::class, 'logout'])->name('login.logout');
 });
@@ -45,11 +44,22 @@ Route::post('/login', [App\Http\Controllers\AuthController::class, 'login'])->na
 //     return view('video.home');
 // })->name('home');
 
-Route::get('/', [App\Http\Controllers\VideoController::class, 'home'])->name('home');
+Route::group(['middleware' => ['permitCountries']], function(){
+    Route::get('/', [App\Http\Controllers\HomeController::class, 'home_permit'])->name('home');
+});
 
-// Route::get('/app/setup', function(){
-//     Artisan::call('storage:link');
-//     Artisan::call('migrate:fresh --seed');
-//     Artisan::call('db:seed');
-//     echo "Setup!!!";
-// });
+Route::get('/deny', [App\Http\Controllers\HomeController::class, 'home_deny'])->name('home.deny');
+
+Route::group(['middleware' => ['authMiddleware']], function(){
+    Route::get('/app/setup', function(){
+        // Artisan::call('storage:link');
+        // echo "storage:link <br />";
+        // Artisan::call('migrate:fresh --seed');
+        // echo "migrate:fresh --seed <br />";
+        Artisan::call('migrate --seed');
+        echo "migrate --seed <br />";
+        // Artisan::call('db:seed');
+        // echo "db:seed <br />";
+        echo "Setup!!! <br />";
+    });
+});

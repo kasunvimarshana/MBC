@@ -17,19 +17,6 @@ class VideoController extends Controller
         $this->storage_uri = env('STORAGE_URI', 'mbc_images');
     }
 
-    public function home(){
-        $ip = $_SERVER['REMOTE_ADDR'];
-        $json = file_get_contents('http://www.geoplugin.net/json.gp?ip='.$ip);
-        //dd($json);
-        $arr = json_decode($json);
-        if($arr->geoplugin_countryCode == 'MW'){
-            return view('video.home');
-        }else{
-            return view('video.home_blocked');
-        }
-        
-    }
-
     /**
      * Display a listing of the resource.
      *
@@ -227,7 +214,7 @@ class VideoController extends Controller
         $limit = 10; //$limit = PHP_INT_MAX;
         $page = 0;
         $videos = Video::orderBy('id', 'desc');
-        if( $request->has('is_paginate') && $request->filled('is_paginate') && $this->is_true($request->input('is_paginate')) ){
+        if( $request->has('is_paginate') && $request->filled('is_paginate') && is_true($request->input('is_paginate')) ){
             if( $request->has('limit') && $request->filled('limit') ){
                 $limit = abs(intval( $request->input('limit') ));
             }
