@@ -306,6 +306,10 @@ class AudioPlayerScreeen extends Component {
         // return true;
     }
 
+    _exitApp = () => {
+        BackHandler.exitApp();
+    }
+
     render() {
         return (
             <SafeAreaView style={styles.container}>
@@ -335,7 +339,11 @@ class AudioPlayerScreeen extends Component {
                                         disabled={!this.state.playbackStatus.isPlaying} 
                                         onPress={this._pauseSoundObject}
                                     >
-                                        <FontAwesome5 name="pause" size={32} color="#93A8B3"></FontAwesome5>
+                                        <FontAwesome5 
+                                            name="pause" 
+                                            size={32} 
+                                            color={( this.state.playbackStatus.isPlaying === true ) ? colors.black : "#93A8B3"}
+                                        ></FontAwesome5>
                                     </TouchableOpacity>
                                     <TouchableOpacity 
                                         disabled={this.state.playbackStatus.isPlaying} 
@@ -355,7 +363,11 @@ class AudioPlayerScreeen extends Component {
                                         disabled={!this.state.playbackStatus.isPlaying} 
                                         onPress={this._stopSoundObject}
                                     >
-                                        <FontAwesome5 name="stop" size={32} color="#93A8B3"></FontAwesome5>
+                                        <FontAwesome5 
+                                            name="stop" 
+                                            size={32} 
+                                            color={( this.state.playbackStatus.isPlaying === true ) ? colors.black : "#93A8B3"}
+                                        ></FontAwesome5>
                                     </TouchableOpacity>
                                 </View>
                             </React.Fragment>

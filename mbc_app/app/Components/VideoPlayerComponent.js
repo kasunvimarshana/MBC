@@ -24,6 +24,8 @@ const VideoPlayerComponent = ( props ) => {
     const [videoSourceData, setVideoSourceData] = React.useState( sourceData );
     const [isPlaying, setIsPlaying] = React.useState(shouldPlay);
     const [isShowLoadingComponent, setShowLoadingComponent] = React.useState(false);
+    const [ttl, setTTL] = React.useState( 30 );
+    const [errorCount, setErrorCount] = React.useState( 0 );
     const videoPlayerRef = React.useRef();
     
     React.useEffect(() => {
@@ -35,7 +37,7 @@ const VideoPlayerComponent = ( props ) => {
             // setIsPlaying( props.shouldPlay, console.log("setIsPlaying", props.shouldPlay) );
             Promise.all([setVideoSourceData(tempVideoSourceData), setIsPlaying(props.shouldPlay)])
             .finally(() => {
-                _loadVideoObject( false );
+                _loadVideoObject( isPlaying );
             });
         }
         //cleanup
@@ -64,23 +66,22 @@ const VideoPlayerComponent = ( props ) => {
         if( _isMountedRef.current === true ){
             setPlaybackStatus(_playbackStatus);
             if( _playbackStatus.isLoaded ){
-                setShowLoadingComponent(false, console.log("setShowLoadingComponent", false));
-                // setIsPlaying( _playbackStatus.isPlaying, console.error("setIsPlaying", _playbackStatus.isPlaying) );
+                setIsPlaying(_playbackStatus.isPlaying, console.log("setIsPlaying", _playbackStatus.isPlaying));
             }
         }
 
         if( _playbackStatus.isLoaded ){
             console.log("isLoaded", _playbackStatus.isLoaded);
             if( _playbackStatus.isPlaying ){
-                console.log("isPlaying", _playbackStatus.isPlaying);
+                // console.log("isPlaying", _playbackStatus.isPlaying);
             }else{
-                console.log("!isPlaying", !_playbackStatus.isPlaying);
+                // console.log("!isPlaying", !_playbackStatus.isPlaying);
             }
 
             if( _playbackStatus.isBuffering ){
-                console.log("isBuffering", _playbackStatus.isBuffering);
+                // console.log("isBuffering", _playbackStatus.isBuffering);
             }else{
-                console.log("!isBuffering", !_playbackStatus.isBuffering);
+                // console.log("!isBuffering", !_playbackStatus.isBuffering);
             }
 
             if( _playbackStatus.didJustFinish && !_playbackStatus.isLooping ){
@@ -108,10 +109,10 @@ const VideoPlayerComponent = ( props ) => {
     const _errorCallbackHandler = React.useCallback((error) => {
         //console.error('Error: ', error.message, error.type, error.obj);
         console.log('errorCallbackHandler', error);
+        setErrorCount((prevErrorCount) => (prevErrorCount + 1), console.log("setErrorCount"));
         // _loadVideoObject
-        setShowLoadingComponent(true, console.log("setShowLoadingComponent", true));
         _loadVideoObject( true );
-    }, []);
+    }, [errorCount, isPlaying]);
 
     const _unloadVideoObject = React.useCallback( async () => {
         let result = null;
@@ -131,13 +132,13 @@ const VideoPlayerComponent = ( props ) => {
             try{
                 // result = await videoPlayerRef.current.loadAsync(tempSource, {shouldPlay: true}, downloadFirst = true);
                 result = await videoPlayerRef.current.loadAsync(videoSourceData);
-                videoPlayerRef.current.setStatusAsync({shouldPlay: _shouldPlay});
+                videoPlayerRef.current.setStatusAsync({shouldPlay: Boolean( _shouldPlay )});
                 // videoPlayerRef.current.isMuted = false;
                 // await videoPlayerRef.current.playAsync();
                 if( _shouldPlay === true ){
                     await videoPlayerRef.current.playAsync();
                 }
-                console.log("_loadVideoObject");
+                console.log("_loadVideoObject", _shouldPlay, Boolean( _shouldPlay ));
             }catch(error){
                 console.log("error", error);
             }
@@ -154,6 +155,16 @@ const VideoPlayerComponent = ( props ) => {
                 style={{backgroundColor: 'rgba(52, 52, 52, 0.8)'}}
             />
         );
+    }
+
+    const _onLoadStartHandler = () => {
+        console.log("_onLoadStartHandler");
+        setShowLoadingComponent(true, console.log("setShowLoadingComponent", true));
+    }
+
+    const _onLoadHandler = () => {
+        console.log("_onLoadHandler");
+        setShowLoadingComponent(false, console.log("setShowLoadingComponent", false));
     }
     
     return (
@@ -172,12 +183,12 @@ const VideoPlayerComponent = ( props ) => {
                 usePoster = {true}
                 posterSource = {logoImage}
                 posterStyle = {styles.posterStyle}
-                // progressUpdateIntervalMillis = {1000}
+                progressUpdateIntervalMillis = {30000}
                 onPlaybackStatusUpdate = {(onPlaybackStatus) => {_onPlaybackStatusUpdate(onPlaybackStatus)}}
                 onReadyForDisplay = {() => console.log("onReadyForDisplay")}
                 onFullscreenUpdate = {() => console.log("onFullscreenUpdate")}
-                onLoadStart = {() => console.log("onLoadStart")}
-                onLoad = {() => console.log("onLoad")}
+                onLoadStart = {() => {_onLoadStartHandler()}}
+                onLoad = {() => {_onLoadHandler()}}
                 onError = {(error) => { _errorCallbackHandler(error) }}
                 {...playerProps}
             />

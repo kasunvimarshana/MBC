@@ -239,6 +239,10 @@ class VideoListScreen extends Component {
         await ScreenOrientation.unlockAsync();
     }
 
+    _exitApp = () => {
+        BackHandler.exitApp();
+    }
+
     render() {
         const content = this.getViewContent();
         return(

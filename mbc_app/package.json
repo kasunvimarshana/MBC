@@ -5,7 +5,8 @@
     "android": "expo start --android",
     "ios": "expo start --ios",
     "web": "expo start --web",
-    "eject": "expo eject"
+    "eject": "expo eject",
+    "_expo_optimize": "npx expo-optimize"
   },
   "dependencies": {
     "@expo/vector-icons": "^12.0.0",
@@ -51,7 +52,8 @@
   "devDependencies": {
     "@babel/core": "~7.9.0",
     "babel-plugin-optional-require": "^0.3.1",
-    "npm-install-peers": "^1.2.2"
+    "npm-install-peers": "^1.2.2",
+    "sharp-cli": "^1.15.0"
   },
   "peerDependencies": {},
   "optionalDependencies": {},

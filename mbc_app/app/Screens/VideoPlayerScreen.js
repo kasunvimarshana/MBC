@@ -90,6 +90,10 @@ class VideoPlayerScreen extends Component {
         // return true;
     }
 
+    _exitApp = () => {
+        BackHandler.exitApp();
+    }
+
     render() {
         return(
             <SafeAreaView style={styles.container}>

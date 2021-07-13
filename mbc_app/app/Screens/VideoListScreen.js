@@ -303,6 +303,10 @@ class VideoListScreen extends Component {
     reRender = () => {
         this.forceUpdate();
     };
+
+    _exitApp = () => {
+        BackHandler.exitApp();
+    }
     /* *** */
 
     render() {

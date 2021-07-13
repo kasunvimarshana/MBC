@@ -148,6 +148,10 @@ class LiveStreamVideoPlayerScreen extends Component {
         this.forceUpdate();
     };
 
+    _exitApp = () => {
+        BackHandler.exitApp();
+    }
+
     render() {
         return(
             <SafeAreaView style={styles.container}>

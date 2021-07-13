@@ -1,0 +1,88 @@
+export class MediaPlayerScreen extends Component {
+    static navigationOptions = {
+        //header: null,
+        headerTitle: '',
+        headerTransparent: false,
+        headerTintColor: 'white',
+    }
+
+    constructor(props) {
+        super(props)
+        this.AG = AG.instance
+        this.filePath =
+            this.AG.getFilePath() + props.navigation.state.params.file
+        this.windowWidth = Dimensions.get('window').width
+        this.windowHeight = Dimensions.get('window').height
+    }
+    //
+    onPlaybackStatusUpdate = (playbackStatus) => {
+        if (playbackStatus.didJustFinish) {
+            this.props.navigation.goBack()
+        }
+    }
+    //
+    _handleVideoRef = async (component) => {
+        const playbackObject = component
+        if (playbackObject) {
+            await playbackObject.loadAsync({
+                uri: this.filePath,
+                shouldPlay: false,
+                posterSource: this.poster,
+            })
+            // todo: Trigger fullScreen without videoStack loading
+            //playbackObject.presentFullscreenPlayer();
+            playbackObject.playAsync()
+            //playbackObject.setOnPlaybackStatusUpdate(this.onPlaybackStatusUpdate);
+        }
+    }
+
+    componentDidMount() {
+        ScreenOrientation.lockAsync(ScreenOrientation.OrientationLock.LANDSCAPE)
+    }
+
+    componentWillUnmount() {
+        //playbackObject.dismissFullscreenPlayer();
+        //this.props.navigation.goBack();
+        ScreenOrientation.lockAsync(
+            ScreenOrientation.OrientationLock.PORTRAIT_UP
+        )
+    }
+    
+    onFullscreenUpdate = ({ fullscreenUpdate, status }) => {
+        console.log(fullscreenUpdate, status)
+        switch (fullscreenUpdate) {
+            case Video.FULLSCREEN_UPDATE_PLAYER_WILL_PRESENT:
+                console.log(' the fullscreen player is about to present')
+                break
+            case Video.FULLSCREEN_UPDATE_PLAYER_DID_PRESENT:
+                console.log('the fullscreen player just finished presenting')
+                break
+            case Video.FULLSCREEN_UPDATE_PLAYER_WILL_DISMISS:
+                console.log('the fullscreen player is about to dismiss')
+                break
+            case Video.FULLSCREEN_UPDATE_PLAYER_DID_DISMISS:
+                console.log('the fullscreen player just finished dismissing')
+        }
+    }
+    
+    render() {
+        return (
+            <SafeAreaView style={styles.container}>
+                <Video
+                    ref={this._handleVideoRef}
+                    useNativeControls
+                    rate={1.0}
+                    resizeMode="contain"
+                    onPlaybackStatusUpdate={(playbackStatus) =>
+                        this.onPlaybackStatusUpdate(playbackStatus)
+                    }
+                    onFullscreenUpdate={this.onFullscreenUpdate}
+                    style={{
+                        width: this.windowHeight,
+                        height: this.windowWidth,
+                    }}
+                />
+            </SafeAreaView>
+        )
+    }
+}
