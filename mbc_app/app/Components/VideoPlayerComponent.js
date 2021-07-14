@@ -66,7 +66,7 @@ const VideoPlayerComponent = ( props ) => {
         if( _isMountedRef.current === true ){
             setPlaybackStatus(_playbackStatus);
             if( _playbackStatus.isLoaded ){
-                setIsPlaying(_playbackStatus.isPlaying, console.log("setIsPlaying", _playbackStatus.isPlaying));
+                // setIsPlaying(_playbackStatus.isPlaying, console.log("setIsPlaying", _playbackStatus.isPlaying));
             }
         }
 
